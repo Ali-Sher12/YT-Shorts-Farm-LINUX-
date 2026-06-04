@@ -10,13 +10,17 @@ float gravity_strength = 9;
 class BallClass {
     //The main class which is responsible for all the physics and 
     //standard stuff, such as collisions and sizes.
-    float originX = screenWidth/2; // The coordinates
-    float originY = screenHeight/2;
+    float coordX = 100; // The coordinates
+    float coordY = 200;
+
+    float centerX = dimention/2; 
+    float centerY = dimention/2;
 
     float radius = 20;
     float velocityX = 0;
     float velocityY = 2;    
     float terminal_velocity = 50;
+    float rotation_angle = 0;
     float rotation_speed = 0; // radian per sec. 
     float rotation_direction = 1; // 1 for counterclockwise, -1 for clockwise     
 
@@ -28,8 +32,8 @@ class BallClass {
     {
         // Can pass the same texture if multiple balls need to have the same texture                
         ballSprite = new Sprite(ballTexture);
-        ballSprite->setOrigin({dimention/2, dimention/2});
-        ballSprite->setPosition({originX,originY});
+        ballSprite->setOrigin({centerX, centerY});
+        ballSprite->setPosition({coordX,coordY});
     }
 
     //To be defined parameters unknown
