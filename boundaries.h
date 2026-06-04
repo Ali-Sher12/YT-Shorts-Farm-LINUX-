@@ -24,7 +24,7 @@ class N_Sided_Polygon_Boundary{
     vector<pair_custom> vertices_transformed_and_mapped;    
     float centerX = screenWidth/2; // The coordinates
     float centerY = screenHeight/2-200;    
-    float radius = 200;
+    float radius = 300;
     float rotation_angle = 0;
     float rotation_speed = 0.02;
     float total_vertices = 0;    
@@ -42,6 +42,9 @@ class N_Sided_Polygon_Boundary{
         total_vertices = N;    
         defineVertices_psuedotype(N);
     }
+
+    float getCenterX(){return centerX;}
+    float getCenterY(){return centerY;}    
 
     private:
     void defineVertices_psuedotype(int N)

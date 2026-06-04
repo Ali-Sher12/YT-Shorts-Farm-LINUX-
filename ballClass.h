@@ -12,11 +12,12 @@ class BallClass {
     //standard stuff, such as collisions and sizes.
     float coordX = 100; // The coordinates
     float coordY = 200;
-
+    
+    float dimention = 90; //height and width, need to be same
     float centerX = dimention/2; 
     float centerY = dimention/2;
 
-    float radius = 20;
+    float radius = 0;
     float velocityX = 0;
     float velocityY = 2;    
     float terminal_velocity = 50;
@@ -24,18 +25,22 @@ class BallClass {
     float rotation_speed = 0; // radian per sec. 
     float rotation_direction = 1; // 1 for counterclockwise, -1 for clockwise     
 
-    float dimention = 20; //height and width, need to be same
     Sprite* ballSprite = NULL;
 
     public:
     BallClass(Texture& ballTexture)
     {
         // Can pass the same texture if multiple balls need to have the same texture                
+        radius = dimention/2;
         ballSprite = new Sprite(ballTexture);
-        ballSprite->setOrigin({centerX, centerY});
+        ballSprite->setScale
+        ({(dimention/ballTexture.getSize().x), (dimention/ballTexture.getSize().y)});
+
+        ballSprite->setOrigin({ballTexture.getSize().x/2, ballTexture.getSize().x/2});
         ballSprite->setPosition({coordX,coordY});
     }
 
+    private:
     //To be defined parameters unknown
     bool detectCollisionWithOtherBalls()
     {
@@ -53,8 +58,15 @@ class BallClass {
     {}
     void updateBallPosition()
     {}
+
+    public:
+    void setCOORD_initial(int x,int y)
+    {
+        coordX = x; coordY = y;
+    }
     void drawBall(RenderWindow& window)
     {
+        ballSprite->setPosition({coordX,coordY});//line here temporarily
         window.draw(*ballSprite);
     }
 
@@ -64,10 +76,14 @@ class BallClass {
     }
 };
 
-class BallPakistan:public BallClass
+class BallBatman:public BallClass
 {
     public:
-    BallPakistan(Texture& ballTexture_Pakistan):BallClass(ballTexture_Pakistan)
-    {}
+    BallBatman(Texture& batmanBallTexture):BallClass(batmanBallTexture){}
+};
 
+class BallSpiderman:public BallClass
+{
+    public:
+    BallSpiderman(Texture& spiderBallTexture):BallClass(spiderBallTexture){}
 };

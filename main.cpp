@@ -13,12 +13,17 @@ int main()
 {
     RenderWindow window(VideoMode({screenWidth, screenHeight}), "Ball Farm");
 
-/////////////////////////// sample
-    Texture t;
-    t.loadFromFile("pak.png");
-    BallPakistan* b = new BallPakistan(t);
-/////////////////////////// sample
-    N_Sided_Polygon_Boundary mainBoundary(5);
+/////////////////////////// Texture setup
+    Texture batmanBallTexture, spiderBallTexture;    
+    batmanBallTexture.loadFromFile("Data/bat.png");
+    spiderBallTexture.loadFromFile("Data/spider.png");    
+///////////////////////////    
+    N_Sided_Polygon_Boundary mainBoundary(7);
+    BallBatman* batmanBallObj = new BallBatman(batmanBallTexture);
+    BallSpiderman* spiderBallObj = new BallSpiderman(spiderBallTexture);    
+
+    batmanBallObj->setCOORD_initial(mainBoundary.getCenterX(),mainBoundary.getCenterY());
+    spiderBallObj->setCOORD_initial(mainBoundary.getCenterX()+200,mainBoundary.getCenterY());    
 
     while (window.isOpen())
     {
@@ -29,8 +34,11 @@ int main()
         }
 
         window.clear();
-        b->drawBall(window);
+        batmanBallObj->drawBall(window);
+        spiderBallObj->drawBall(window);        
         mainBoundary.drawPolygon(window);
         window.display();
     }
+    delete batmanBallObj;
+    delete spiderBallObj;    
 }
