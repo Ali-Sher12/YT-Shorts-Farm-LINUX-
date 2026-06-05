@@ -20,10 +20,10 @@ int main()
 ///////////////////////////    
     N_Sided_Polygon_Boundary mainBoundary(7);
     BallBatman* batmanBallObj = new BallBatman(batmanBallTexture);
-    BallSpiderman* spiderBallObj = new BallSpiderman(spiderBallTexture);    
+//    BallSpiderman* spiderBallObj = new BallSpiderman(spiderBallTexture);    
 
     batmanBallObj->setCOORD_initial(mainBoundary.getCenterX(),mainBoundary.getCenterY());
-    spiderBallObj->setCOORD_initial(mainBoundary.getCenterX()+200,mainBoundary.getCenterY());    
+//    spiderBallObj->setCOORD_initial(mainBoundary.getCenterX()+200,mainBoundary.getCenterY());    
 
     while (window.isOpen())
     {
@@ -32,13 +32,15 @@ int main()
             if (event->is<Event::Closed>())
                 window.close();
         }
+        //This must be called before any collision checks
+        mainBoundary.rotate_polygon_and_map_to_SFML_Window();
 
         window.clear();
         batmanBallObj->drawBall(window);
-        spiderBallObj->drawBall(window);        
+//        spiderBallObj->drawBall(window);        
         mainBoundary.drawPolygon(window);
         window.display();
     }
     delete batmanBallObj;
-    delete spiderBallObj;    
+//    delete spiderBallObj;    
 }

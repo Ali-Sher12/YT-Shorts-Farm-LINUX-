@@ -9,15 +9,6 @@ using namespace sf;
 //How do I make the boundary move and rotate?
 //How do I have cavities inside it? How do I set textures on it?
 
-struct pair_custom{
-    float x=0;
-    float y=0;
-    void set(float a,float b)
-    {
-        x=a;y=b;
-    }
-};
-
 class N_Sided_Polygon_Boundary{
 
     vector<pair_custom> vertices_original;
@@ -45,7 +36,14 @@ class N_Sided_Polygon_Boundary{
 
     float getCenterX(){return centerX;}
     float getCenterY(){return centerY;}    
-
+    vector<pair_custom> getVerticeList(){return vertices_transformed_and_mapped;}
+    float getCurrentAngle(){return rotation_angle;}
+    float getRotationSpeed(){return rotation_speed;}        
+    float gettotalVertices(){return total_vertices;}
+    //delete if these go unused
+    float getDelta_t(){return delta_t;}
+    float getRadius(){return radius;}
+    //////////////
     private:
     void defineVertices_psuedotype(int N)
     {
@@ -61,6 +59,7 @@ class N_Sided_Polygon_Boundary{
         }
     }
 
+    public:
     void rotate_polygon_and_map_to_SFML_Window()
     {
         //rotation_speed>0 -> clockwise
@@ -76,10 +75,8 @@ class N_Sided_Polygon_Boundary{
         }
     }
 
-    public:
     void drawPolygon(RenderWindow& window)
     {
-        rotate_polygon_and_map_to_SFML_Window();
         window.draw(polygon);
     }
 
