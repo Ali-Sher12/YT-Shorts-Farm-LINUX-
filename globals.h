@@ -4,7 +4,7 @@ using namespace std;
 float screenHeight = 1080;
 float screenWidth = 608;
 float PI = 3.14159;
-float e = 2.71828;
+float e = 1;
 struct pair_custom{
     float x=0;
     float y=0;

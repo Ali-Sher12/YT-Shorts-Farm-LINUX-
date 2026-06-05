@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <iostream>
 #include <cmath>
 #include <vector>
 #include "globals.h"
@@ -14,16 +15,13 @@ int main()
     RenderWindow window(VideoMode({screenWidth, screenHeight}), "Ball Farm");
 
 /////////////////////////// Texture setup
-    Texture batmanBallTexture, spiderBallTexture;    
+    Texture batmanBallTexture;
     batmanBallTexture.loadFromFile("Data/bat.png");
-    spiderBallTexture.loadFromFile("Data/spider.png");    
 ///////////////////////////    
-    N_Sided_Polygon_Boundary mainBoundary(7);
-    BallBatman* batmanBallObj = new BallBatman(batmanBallTexture);
-//    BallSpiderman* spiderBallObj = new BallSpiderman(spiderBallTexture);    
+    N_Sided_Polygon_Boundary mainBoundary(4);
+    BallBatman* batmanBallObj = new BallBatman(batmanBallTexture,&mainBoundary);
 
-    batmanBallObj->setCOORD_initial(mainBoundary.getCenterX(),mainBoundary.getCenterY());
-//    spiderBallObj->setCOORD_initial(mainBoundary.getCenterX()+200,mainBoundary.getCenterY());    
+    batmanBallObj->setCOORD_initial(mainBoundary.getCenterX()-50,mainBoundary.getCenterY());
 
     while (window.isOpen())
     {
@@ -34,13 +32,12 @@ int main()
         }
         //This must be called before any collision checks
         mainBoundary.rotate_polygon_and_map_to_SFML_Window();
+        batmanBallObj->callBallPhysicsFunctions(&mainBoundary);
 
         window.clear();
         batmanBallObj->drawBall(window);
-//        spiderBallObj->drawBall(window);        
         mainBoundary.drawPolygon(window);
         window.display();
     }
     delete batmanBallObj;
-//    delete spiderBallObj;    
 }
