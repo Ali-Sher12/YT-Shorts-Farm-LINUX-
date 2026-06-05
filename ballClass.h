@@ -24,8 +24,7 @@ class BallClass {
     float velocityY = 5;    
     float terminal_velocity = 20;
     float rotation_angle = 0;
-    float rotation_speed = 0; // radian per sec. 
-    float rotation_direction = 1; // 1 for counterclockwise, -1 for clockwise     
+
     Sprite* ballSprite = NULL;
     vector<pair_custom> tempBoundaryVertices;
     public:
@@ -64,6 +63,8 @@ class BallClass {
     pair_custom new_coord_temp;          
     pair_custom P;
     pair_custom perp;
+    float rotation_const = 0.01;
+
     void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary)
     {
         int total_vertices = (int)(boundary->gettotalVertices());
@@ -100,15 +101,16 @@ class BallClass {
                 ball_velocity.set(velocityX,velocityY);
                 r_vector.set(-1*(Q.y-boundary->getCenterY()),Q.x-boundary->getCenterX());
                 wall_velocity = mulVecPair(boundary->getRotationSpeed(),r_vector);
+              
                 relative_velocity = subPair(ball_velocity,wall_velocity);
                 if(computeDotProduct(relative_velocity,normal_vector)<0)
                 {
+//                    implementFriction(AB,relative_velocity);
                     ball_velocity = addPair(subPair(relative_velocity , 
                     mulVecPair((1+e)*computeDotProduct(relative_velocity,normal_vector),normal_vector)),wall_velocity);
                     velocityX = ball_velocity.x;
                     velocityY = ball_velocity.y;                
                 }
-                //implementFriction(AB,relative_velocity);
             }
         }
     }    
@@ -128,8 +130,8 @@ class BallClass {
     {//to be called in detectCollisionWithBoundary()
         tangent = mulVecPair(1/computeMagnitude(AB),AB);
         float tanget_component = computeDotProduct(relative_velocity,tangent);
-        velocityX = velocityX - friction_coefficient*tanget_component*tangent.x;
-        velocityY = velocityY - friction_coefficient*tanget_component*tangent.y;        
+        velocityX -= friction_coefficient*tanget_component*tangent.x;
+        velocityY -= friction_coefficient*tanget_component*tangent.y;        
     }
     
     pair_custom temp_terminal;
@@ -143,10 +145,16 @@ class BallClass {
             velocityY = temp_terminal.y;
         }
     }    
-    void detectBallToBallCollision()
-    {}
 
+    Angle rotation_angle_SFML;
     void changeRotation()
+    {
+        rotation_angle+=velocityX*rotation_const*delta_t;
+        rotation_angle_SFML = radians(rotation_angle);
+        ballSprite->setRotation(rotation_angle_SFML);
+    }
+
+    void detectBallToBallCollision()
     {}
 
     public:
@@ -154,7 +162,7 @@ class BallClass {
     {
         implementGravity();
         detectCollisionWithBoundary(boundary);
-
+        changeRotation();
 
         checkTerminalVelocity();
         finalCOORDUpdate();
