@@ -19,19 +19,21 @@ class BallClass {
 
     float radius = 0;
     float friction_coefficient = 0.3;
-    float delta_t = 0.02;
+    float delta_t = 0.03;
     float velocityX = 0;
     float velocityY = 5;    
-    float terminal_velocity = 20;
+    float terminal_velocity = 15;
     float rotation_angle = 0;
+    float mass = 0;
 
     Sprite* ballSprite = NULL;
     vector<pair_custom> tempBoundaryVertices;
     public:
-    BallClass(Texture& ballTexture, N_Sided_Polygon_Boundary* boundary)
+    BallClass(Texture& ballTexture,float dimention)
     {
         // Can pass the same texture if multiple balls need to have the same texture                
         radius = dimention/2;
+        mass = radius;
         ballSprite = new Sprite(ballTexture);
         ballSprite->setScale
         ({(dimention/ballTexture.getSize().x), (dimention/ballTexture.getSize().y)});
@@ -63,7 +65,7 @@ class BallClass {
     pair_custom new_coord_temp;          
     pair_custom P;
     pair_custom perp;
-    float rotation_const = 0.01;
+    float rotation_const = 0.015;
 
     void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary)
     {
@@ -154,16 +156,62 @@ class BallClass {
         ballSprite->setRotation(rotation_angle_SFML);
     }
 
-    void detectBallToBallCollision()
-    {}
+    float penetration_const;
+    float relative_velocity_along_normal;
+    float impulse_scalar;
+
+    float radius2,mass2,beta = 0.5;
+    pair_custom v1,v2,centerPair2;
+    void detectBallToBallCollision(vector<BallClass*> ballObjects,int own_index)
+    {
+        float total_balls = ballObjects.size();
+        for(int i = own_index+1 ; i<total_balls; i++){
+            centerPair.set(coordX-ballObjects[i]->coordX,coordY-ballObjects[i]->coordY);
+            float dist = computeMagnitude(centerPair);
+            if(dist>(radius+ballObjects[i]->radius) || dist<0.0001f)
+                continue;
+
+            mass2 = ballObjects[i]->mass;
+            radius2 = ballObjects[i]->radius;
+            v1.set(velocityX,velocityY);
+            v2.set(ballObjects[i]->velocityX,ballObjects[i]->velocityY);
+            centerPair.set(coordX,coordY);
+            centerPair2.set(ballObjects[i]->coordX,ballObjects[i]->coordY);
+            
+            normal_vector.set((coordX-centerPair2.x)/dist,(coordY-centerPair2.y)/dist);
+            //penetrationDepth of ball to wall collision will be repurposed
+            penetrationDepth = (radius + radius2)-dist;
+            penetration_const = penetrationDepth*beta*(mass/(mass+mass2));
+            centerPair = addPair(centerPair,mulVecPair(penetration_const,normal_vector));
+            coordX = centerPair.x;
+            coordY = centerPair.y;
+            penetration_const = penetrationDepth*beta*((mass2)/(mass+mass2));
+            centerPair2 = addPair(centerPair2,mulVecPair(penetration_const,normal_vector));            
+            ballObjects[i]->coordX = centerPair2.x;
+            ballObjects[i]->coordY = centerPair2.y;
+
+            relative_velocity_along_normal = computeDotProduct(subPair(v1,v2),normal_vector);
+            if (relative_velocity_along_normal > 0) 
+                continue;
+            impulse_scalar = ((-1-e)*relative_velocity_along_normal)/((1/mass)+(1/mass2));
+            v1 = addPair(v1,mulVecPair(impulse_scalar/mass,normal_vector));
+            v2 = subPair(v2,mulVecPair(impulse_scalar/mass2,normal_vector));
+            velocityX = v1.x;
+            velocityY = v1.y;            
+            ballObjects[i]->velocityX = v2.x;
+            ballObjects[i]->velocityY = v2.y; 
+        }
+
+    }
+
 
     public:
-    void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary)
+    void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*> ballObjects,int own_index)
     {
         implementGravity();
         detectCollisionWithBoundary(boundary);
         changeRotation();
-
+        detectBallToBallCollision(ballObjects,own_index);
         checkTerminalVelocity();
         finalCOORDUpdate();
     }
@@ -187,5 +235,41 @@ class BallClass {
 class BallBatman:public BallClass
 {
     public:
-    BallBatman(Texture& batmanBallTexture,N_Sided_Polygon_Boundary* boundary):BallClass(batmanBallTexture, boundary){}
+    BallBatman(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
+    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
+    // void setCOORD_initial(int x,int y){}
+    // void drawBall(RenderWindow& window){}
+
 };
+class BallSpider:public BallClass
+{
+    public:
+    BallSpider(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
+    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
+    // void setCOORD_initial(int x,int y){}
+    // void drawBall(RenderWindow& window){}
+
+};
+class BallSuper:public BallClass
+{
+    public:
+    BallSuper(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
+    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
+    // void setCOORD_initial(int x,int y){}
+    // void drawBall(RenderWindow& window){}
+
+};
+class BallHulk:public BallClass
+{
+    public:
+    BallHulk(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
+    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
+    // void setCOORD_initial(int x,int y){}
+    // void drawBall(RenderWindow& window){}
+
+};
+
