@@ -5,6 +5,9 @@ float screenHeight = 1080;
 float screenWidth = 608;
 float PI = 3.14159;
 float e = 1;
+Sound* ball_collide_sound, *wall_collide_sound;
+SoundBuffer ball_collide_buffer,wall_collide_buffer;
+
 struct pair_custom{
     float x=0;
     float y=0;

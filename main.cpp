@@ -15,13 +15,19 @@ int main()
 {
     RenderWindow window(VideoMode({screenWidth, screenHeight}), "Ball Farm");
 
+    ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
+    wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
+    ball_collide_sound = new Sound(ball_collide_buffer);
+    wall_collide_sound = new Sound(wall_collide_buffer);
+    ball_collide_sound->setVolume(100);
+    wall_collide_sound->setVolume(100);    
 /////////////////////////// Texture setup
     Texture batmanBallTexture,spiderBallTexture,superBallTexture,hulkBallTexture,invincibleBallTexture;
-    batmanBallTexture.loadFromFile("Data/bat.png");
-    superBallTexture.loadFromFile("Data/sup.png");
-    spiderBallTexture.loadFromFile("Data/spider.png");
-    hulkBallTexture.loadFromFile("Data/hulk.png");    
-    invincibleBallTexture.loadFromFile("Data/inv.png");
+    batmanBallTexture.loadFromFile("Data/Images/bat.png");
+    superBallTexture.loadFromFile("Data/Images/sup.png");
+    spiderBallTexture.loadFromFile("Data/Images/spider.png");
+    hulkBallTexture.loadFromFile("Data/Images/hulk.png");    
+    invincibleBallTexture.loadFromFile("Data/Images/inv.png");
     ///////////////////////////    
     N_Sided_Polygon_Boundary mainBoundary(5);
     vector<BallClass*> ballObjects;
@@ -58,7 +64,8 @@ int main()
         }        
         mainBoundary.drawPolygon(window);
         window.display();
-//        sleep(milliseconds(500));
+
+//        sleep(milliseconds(5));
     }
     
 }

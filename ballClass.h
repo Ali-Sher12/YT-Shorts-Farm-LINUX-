@@ -97,6 +97,7 @@ class BallClass {
             new_coord_temp = addPair(centerPair,mulVecPair(penetrationDepth , normal_vector));
             if(collisionOccured == true)
             {
+//                wall_collide_sound->play();
                 coordX = new_coord_temp.x;
                 coordY = new_coord_temp.y;
                 //implement step 7, not 6
@@ -170,7 +171,7 @@ class BallClass {
             float dist = computeMagnitude(centerPair);
             if(dist>(radius+ballObjects[i]->radius) || dist<0.0001f)
                 continue;
-
+            ball_collide_sound->play();
             mass2 = ballObjects[i]->mass;
             radius2 = ballObjects[i]->radius;
             v1.set(velocityX,velocityY);
