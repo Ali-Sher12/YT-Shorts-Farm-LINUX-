@@ -236,40 +236,25 @@ class BallBatman:public BallClass
 {
     public:
     BallBatman(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
-    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
-    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
-    // void setCOORD_initial(int x,int y){}
-    // void drawBall(RenderWindow& window){}
-
 };
 class BallSpider:public BallClass
 {
     public:
     BallSpider(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
-    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
-    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
-    // void setCOORD_initial(int x,int y){}
-    // void drawBall(RenderWindow& window){}
-
 };
 class BallSuper:public BallClass
 {
     public:
     BallSuper(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
-    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
-    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
-    // void setCOORD_initial(int x,int y){}
-    // void drawBall(RenderWindow& window){}
-
 };
 class BallHulk:public BallClass
 {
     public:
     BallHulk(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
-    // void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary){}
-    // void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary){}
-    // void setCOORD_initial(int x,int y){}
-    // void drawBall(RenderWindow& window){}
-
+};
+class BallInvincible:public BallClass
+{
+    public:
+    BallInvincible(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
 };
 
