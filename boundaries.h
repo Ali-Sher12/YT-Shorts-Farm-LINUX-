@@ -14,7 +14,7 @@ class N_Sided_Polygon_Boundary{
     vector<pair_custom> vertices_original;
     vector<pair_custom> vertices_transformed_and_mapped;    
     float centerX = screenWidth/2; // The coordinates
-    float centerY = screenHeight/2-200;    
+    float centerY = (screenHeight/2);    
     float radius = 300;
     float rotation_angle = 0;
     float rotation_speed = 0.02;

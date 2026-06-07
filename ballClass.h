@@ -28,6 +28,9 @@ class BallClass {
 
     Sprite* ballSprite = NULL;
     vector<pair_custom> tempBoundaryVertices;
+
+    protected:
+    float e = 1;
     public:
     BallClass(Texture& ballTexture,float dimention)
     {
@@ -251,7 +254,9 @@ class BallSuper:public BallClass
 class BallHulk:public BallClass
 {
     public:
-    BallHulk(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    BallHulk(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){
+        BallClass::e = 0.2;
+    }
 };
 class BallInvincible:public BallClass
 {

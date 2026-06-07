@@ -44,6 +44,7 @@ int main()
     ballObjects[3]->setCOORD_initial(mainBoundary.getCenterX()+40,mainBoundary.getCenterY()+40);            
     ballObjects[4]->setCOORD_initial(mainBoundary.getCenterX(),mainBoundary.getCenterY()+80);    
 
+    ////////////    
     while (window.isOpen())
     {
         while (const optional event = window.pollEvent())
@@ -52,6 +53,11 @@ int main()
                 window.close();
         }
         //This must be called before any collision checks
+
+        if (Keyboard::isKeyPressed(Keyboard::Key::Escape))
+        {
+            window.close();
+        }
         mainBoundary.rotate_polygon_and_map_to_SFML_Window();
         for(int i=0;i<ballObjects.size();i++){
             ballObjects[i]->callBallPhysicsFunctions(&mainBoundary,ballObjects,i);
@@ -64,8 +70,11 @@ int main()
         }        
         mainBoundary.drawPolygon(window);
         window.display();
-
 //        sleep(milliseconds(5));
     }
-    
+    for(int i=0;i<ballObjects.size();i++){
+        delete ballObjects[i];
+    }
+
+    return 0;
 }

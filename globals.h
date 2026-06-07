@@ -1,10 +1,11 @@
 #pragma once
 using namespace sf;
 using namespace std;
-float screenHeight = 1080;
-float screenWidth = 608;
+
+int screenWidth = 650;
+int screenHeight = 650;
+
 float PI = 3.14159;
-float e = 1;
 Sound* ball_collide_sound, *wall_collide_sound;
 SoundBuffer ball_collide_buffer,wall_collide_buffer;
 
