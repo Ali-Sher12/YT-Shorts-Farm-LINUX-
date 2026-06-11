@@ -100,7 +100,7 @@ class BallClass {
             new_coord_temp = addPair(centerPair,mulVecPair(penetrationDepth , normal_vector));
             if(collisionOccured == true)
             {
-//                wall_collide_sound->play();
+                // wall_collide_sound->play();
                 coordX = new_coord_temp.x;
                 coordY = new_coord_temp.y;
                 //implement step 7, not 6
@@ -111,9 +111,9 @@ class BallClass {
                 relative_velocity = subPair(ball_velocity,wall_velocity);
                 if(computeDotProduct(relative_velocity,normal_vector)<0)
                 {
-//                    implementFriction(AB,relative_velocity);
-                    ball_velocity = addPair(subPair(relative_velocity , 
-                    mulVecPair((1+e)*computeDotProduct(relative_velocity,normal_vector),normal_vector)),wall_velocity);
+                    relative_velocity = subPair(relative_velocity,mulVecPair((1+e)*computeDotProduct(relative_velocity,normal_vector),normal_vector));
+                    implementFriction(AB,relative_velocity);
+                    ball_velocity = addPair(relative_velocity,wall_velocity);
                     velocityX = ball_velocity.x;
                     velocityY = ball_velocity.y;                
                 }
@@ -123,7 +123,7 @@ class BallClass {
 
     void implementGravity()
     {
-        velocityY = velocityY + gravity_strength*delta_t;
+//        velocityY = velocityY + gravity_strength*delta_t;
     }
     void finalCOORDUpdate()
     {
@@ -132,12 +132,13 @@ class BallClass {
     }
     
     pair_custom tangent;
-    void implementFriction(pair_custom AB,pair_custom relative_velocity)
+    pair_custom implementFriction(pair_custom AB,pair_custom relative_velocity)
     {//to be called in detectCollisionWithBoundary()
         tangent = mulVecPair(1/computeMagnitude(AB),AB);
         float tanget_component = computeDotProduct(relative_velocity,tangent);
-        velocityX -= friction_coefficient*tanget_component*tangent.x;
-        velocityY -= friction_coefficient*tanget_component*tangent.y;        
+        relative_velocity.x -= friction_coefficient*tanget_component*tangent.x;
+        relative_velocity.y -= friction_coefficient*tanget_component*tangent.y;        
+        return relative_velocity;
     }
     
     pair_custom temp_terminal;
@@ -255,7 +256,7 @@ class BallHulk:public BallClass
 {
     public:
     BallHulk(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){
-        BallClass::e = 0.2;
+        BallClass::e = 1.2;
     }
 };
 class BallInvincible:public BallClass

@@ -19,7 +19,7 @@ class N_Sided_Polygon_Boundary{
     float rotation_angle = 0;
     float rotation_speed = 0.02;
     float total_vertices = 0;    
-    float delta_t = 0.05;        
+    float delta_t = 0.04;        
     
     ConvexShape polygon;
     public:

@@ -70,7 +70,7 @@ int main()
         }        
         mainBoundary.drawPolygon(window);
         window.display();
-//        sleep(milliseconds(5));
+        // sleep(milliseconds(1));
     }
     for(int i=0;i<ballObjects.size();i++){
         delete ballObjects[i];
