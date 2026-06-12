@@ -65,6 +65,7 @@ int main()
         for(int i=0;i<total_balls;i++){
             ballObjects[i]->drawBall(window);
         }        
+        ballObjects[0]->callBatarangFunctions(ballObjects,window);
         mainBoundary.drawPolygon(window);
         window.display();
         // sleep(milliseconds(1));

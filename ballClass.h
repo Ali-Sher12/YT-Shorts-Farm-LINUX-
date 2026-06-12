@@ -10,6 +10,7 @@ float gravity_strength = 0.2;
 class BallClass {
     //The main class which is responsible for all the physics and 
     //standard stuff, such as collisions and sizes.
+    protected:
     float coordX = 100; // The coordinates
     float coordY = 200;
     
@@ -28,15 +29,12 @@ class BallClass {
 
     Sprite* ballSprite = NULL;
     vector<pair_custom> tempBoundaryVertices;
-
+    int index_in_array = -1;
     bool activated = true;
-
-    protected:
-
     int health = 0;
     float e = 2;
-
     public:
+    virtual void callBatarangFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
     BallClass(Texture& ballTexture,float dimention,float _VelocityX,float _VelocityY)
     {
         // Can pass the same texture if multiple balls need to have the same texture                
@@ -171,8 +169,9 @@ class BallClass {
 
     float radius2,mass2,beta = 0.5;
     pair_custom v1,v2,centerPair2;
-    void detectBallToBallCollision(vector<BallClass*> ballObjects,int own_index)
+    void detectBallToBallCollision(vector<BallClass*>& ballObjects,int own_index)
     {
+        index_in_array = own_index;
         float total_balls = ballObjects.size();
         for(int i = own_index+1 ; i<total_balls; i++){
 
@@ -223,20 +222,14 @@ class BallClass {
         }
     }
 
-    int health_function(int other_ball_health,int other_ball_mass,float otherVelocity)
-    {
-        if(mass*computeMagnitude(pair_custom(velocityX,velocityY))<other_ball_mass*otherVelocity){
-            health--;
-        }
-        else{
-            return other_ball_health-1;                    
-        }        
-
-        return other_ball_health;
-    }
-
-
     public:
+    float getRadius(){return radius;}
+    float getCoordX(){return coordX;}
+    float getCoordY(){return coordY;}
+    bool getActivationStat(){return activated;}    
+    void depleteHealth(float factor){
+        health-=factor;
+    }        
     void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*> ballObjects,int own_index)
     {
         if(activated){
@@ -273,16 +266,79 @@ class BallClass {
 class BallBatman:public BallClass
 {
     public:
+    Sprite* BatarangSprite;
+    Texture* BatarangTexture;
+    float batarangX,batarangY,batarangRadius;
+    bool batarangActivate = false;
+
+    int appearanceFrames = 5000;
+    int gapFrames = 6000;
+    int frame_index_appearance = 0;
+    int frame_index_gap = 0;    
     BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
         BallClass::health = 5;
+        BatarangTexture = new Texture("Data/Images/inv.png");
+        BatarangSprite = new Sprite(*BatarangTexture);        
+        batarangRadius = BallClass::radius;
+
+        BatarangSprite->setScale
+        ({((batarangRadius*2)/BatarangTexture->getSize().x), ((batarangRadius*2)/BatarangTexture->getSize().y)});
+        BatarangSprite->setOrigin({BatarangTexture->getSize().x/2, BatarangTexture->getSize().x/2});
+
     }
-};
-class BallSpider:public BallClass
-{
+    void deployBatarang(){
+        if(frame_index_gap>=gapFrames)
+        {
+            batarangActivate = true;
+            frame_index_gap = 0;
+            frame_index_appearance = 0;            
+            batarangX = BallClass::coordX;
+            batarangY = BallClass::coordY;        
+        }
+    }
+    void collideDeactivationBatarang(vector<BallClass*>& ballObjects){
+        if(batarangActivate){
+            for(int i=0;i<total_balls;i++){
+                cout<<"i : "<<i<<"\n";
+                if(i!=index_in_array && ballObjects[i]->getActivationStat()){
+                    if((ballObjects[i]->getRadius()+batarangRadius)<=computeMagnitude(pair_custom(batarangX-ballObjects[i]->getCoordX(),batarangY-ballObjects[i]->getCoordY())))
+                    {
+                        ballObjects[i]->depleteHealth(1);
+                        // batarangActivate = false;
+                        // frame_index_appearance = 0;
+                        // frame_index_gap = 0;                    
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    void idleDeactivateBatarang(){
+        if(frame_index_appearance>appearanceFrames){
+            batarangActivate = false;
+            frame_index_appearance = 0;
+            frame_index_gap = 0;                    
+        }
+    }
+    void drawBatarang(RenderWindow& window){
+        if(batarangActivate){
+            frame_index_appearance++;
+            BatarangSprite->setPosition({batarangX,batarangY});
+            window.draw(*BatarangSprite);        
+        }
+        else{
+            frame_index_gap++;
+        }
+    }
     public:
-    BallSpider(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
-        BallClass::health = 7;        
+    void callBatarangFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
+        deployBatarang();
+        collideDeactivationBatarang(ballObjects);
+        idleDeactivateBatarang();
+        drawBatarang(window);
     }
+
+    
 };
 class BallSuper:public BallClass
 {
@@ -290,19 +346,7 @@ class BallSuper:public BallClass
     BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
         BallClass::health = 9;        
     }
-};
-class BallHulk:public BallClass
-{
-    public:
-    BallHulk(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
-        BallClass::health = 11;
-    }
-};
-class BallInvincible:public BallClass
-{
-    public:
-    BallInvincible(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
-        BallClass::health = 8;
-    }
+    void callBatarangFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
+    }    
 };
 
