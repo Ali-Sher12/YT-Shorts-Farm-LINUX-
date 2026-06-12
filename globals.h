@@ -2,8 +2,18 @@
 using namespace sf;
 using namespace std;
 
-int screenWidth = 650;
+///////////////////
+int screenWidth = 1280;
 int screenHeight = 650;
+int PolygonSides = 5;
+float rotationSpeed_Polygon = 0.02;
+float rotationSpeed_ball = 0.04;
+float global_delta_t = 0.03;
+float e_global = 1.3;
+float ball_terminal_velocity = 15;
+bool gravity_true = true;
+bool ball_to_ball_collision = true;
+///////////////////
 
 float PI = 3.14159;
 Sound* ball_collide_sound, *wall_collide_sound;
@@ -12,11 +22,18 @@ SoundBuffer ball_collide_buffer,wall_collide_buffer;
 struct pair_custom{
     float x=0;
     float y=0;
+    pair_custom(){}
+    pair_custom(float a,float b)
+    {
+        x=a;y=b;
+    }    
     void set(float a,float b)
     {
         x=a;y=b;
     }
 };
+
+
 float computeDotProduct(pair_custom A,pair_custom B)
 {
     return A.x*B.x + A.y*B.y;

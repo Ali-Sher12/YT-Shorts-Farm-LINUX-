@@ -29,20 +29,20 @@ int main()
     hulkBallTexture.loadFromFile("Data/Images/hulk.png");    
     invincibleBallTexture.loadFromFile("Data/Images/inv.png");
     ///////////////////////////    
-    N_Sided_Polygon_Boundary mainBoundary(5);
+    N_Sided_Polygon_Boundary mainBoundary(PolygonSides);
     vector<BallClass*> ballObjects;
-    ballObjects.resize(5);
-    ballObjects[0] = new BallBatman(batmanBallTexture,50);
-    ballObjects[1] = new BallSuper(superBallTexture,60);
-    ballObjects[2] = new BallSpider(spiderBallTexture,50);
-    ballObjects[3] = new BallHulk(hulkBallTexture,60);
-    ballObjects[4] = new BallInvincible(invincibleBallTexture,40);
+    ballObjects.resize(2);
+    ballObjects[0] = new BallBatman(batmanBallTexture,50,-10,10);
+    ballObjects[1] = new BallSuper(superBallTexture,60,10,-10);
+    // ballObjects[2] = new BallSpider(spiderBallTexture,50);
+    // ballObjects[3] = new BallHulk(hulkBallTexture,60);
+    // ballObjects[4] = new BallInvincible(invincibleBallTexture,50);
 
-    ballObjects[0]->setCOORD_initial(mainBoundary.getCenterX()-40,mainBoundary.getCenterY()-40);
-    ballObjects[1]->setCOORD_initial(mainBoundary.getCenterX()+40,mainBoundary.getCenterY()-40);
-    ballObjects[2]->setCOORD_initial(mainBoundary.getCenterX()-40,mainBoundary.getCenterY()+40);
-    ballObjects[3]->setCOORD_initial(mainBoundary.getCenterX()+40,mainBoundary.getCenterY()+40);            
-    ballObjects[4]->setCOORD_initial(mainBoundary.getCenterX(),mainBoundary.getCenterY()+80);    
+    ballObjects[0]->setCOORD_initial(mainBoundary.getCenterX()-40,mainBoundary.getCenterY());
+    ballObjects[1]->setCOORD_initial(mainBoundary.getCenterX()+40,mainBoundary.getCenterY());
+    // ballObjects[2]->setCOORD_initial(mainBoundary.getCenterX()-40,mainBoundary.getCenterY()+40);
+    // ballObjects[3]->setCOORD_initial(mainBoundary.getCenterX()+40,mainBoundary.getCenterY()+40);            
+    // ballObjects[4]->setCOORD_initial(mainBoundary.getCenterX(),mainBoundary.getCenterY()+80);    
 
     ////////////    
     while (window.isOpen())

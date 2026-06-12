@@ -25,6 +25,18 @@ class N_Sided_Polygon_Boundary{
     public:
     N_Sided_Polygon_Boundary(int N)
     {
+        rotation_speed = rotationSpeed_Polygon;
+        delta_t = global_delta_t;
+        if(screenHeight>=screenWidth){
+            radius = screenWidth/2 -20;
+            centerY = radius+20;
+        }
+    
+        else{ 
+            radius = screenHeight/2 -20;
+            centerX = radius+20;            
+        }
+
         polygon.setPointCount(N);
         polygon.setFillColor(Color::Transparent);
         polygon.setOutlineColor(Color::Red);

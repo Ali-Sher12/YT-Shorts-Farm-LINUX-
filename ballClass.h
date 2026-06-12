@@ -13,7 +13,7 @@ class BallClass {
     float coordX = 100; // The coordinates
     float coordY = 200;
     
-    float dimention = 70; //height and width, need to be same
+    float dimention = 100; //height and width, need to be same
     float centerX = dimention/2; 
     float centerY = dimention/2;
 
@@ -22,19 +22,30 @@ class BallClass {
     float delta_t = 0.03;
     float velocityX = 0;
     float velocityY = 5;    
-    float terminal_velocity = 15;
+    float terminal_velocity = 20;
     float rotation_angle = 0;
     float mass = 0;
 
     Sprite* ballSprite = NULL;
     vector<pair_custom> tempBoundaryVertices;
 
+    bool activated = true;
+
     protected:
-    float e = 1;
+
+    int health = 0;
+    float e = 2;
+
     public:
-    BallClass(Texture& ballTexture,float dimention)
+    BallClass(Texture& ballTexture,float dimention,float _VelocityX,float _VelocityY)
     {
         // Can pass the same texture if multiple balls need to have the same texture                
+        e = e_global;
+        delta_t = global_delta_t;
+        terminal_velocity = ball_terminal_velocity;        
+        rotation_const = rotationSpeed_ball;
+        velocityX = _VelocityX;
+        velocityY = _VelocityY;        
         radius = dimention/2;
         mass = radius;
         ballSprite = new Sprite(ballTexture);
@@ -46,13 +57,6 @@ class BallClass {
     }
 
     private:
-    //To be defined parameters unknown
-    bool detectCollisionWithOtherBalls()
-    {
-        return false;
-    }
-    //better to handle all the collisions and such in ball class
-    //rather than call each ball to the boundary
     pair_custom A;pair_custom B;
     pair_custom AB;
     float t = 0;
@@ -100,7 +104,7 @@ class BallClass {
             new_coord_temp = addPair(centerPair,mulVecPair(penetrationDepth , normal_vector));
             if(collisionOccured == true)
             {
-                // wall_collide_sound->play();
+                wall_collide_sound->play();
                 coordX = new_coord_temp.x;
                 coordY = new_coord_temp.y;
                 //implement step 7, not 6
@@ -112,7 +116,7 @@ class BallClass {
                 if(computeDotProduct(relative_velocity,normal_vector)<0)
                 {
                     relative_velocity = subPair(relative_velocity,mulVecPair((1+e)*computeDotProduct(relative_velocity,normal_vector),normal_vector));
-                    implementFriction(AB,relative_velocity);
+                    relative_velocity = implementFriction(AB,relative_velocity);
                     ball_velocity = addPair(relative_velocity,wall_velocity);
                     velocityX = ball_velocity.x;
                     velocityY = ball_velocity.y;                
@@ -123,7 +127,7 @@ class BallClass {
 
     void implementGravity()
     {
-//        velocityY = velocityY + gravity_strength*delta_t;
+       velocityY = velocityY + gravity_strength*delta_t;
     }
     void finalCOORDUpdate()
     {
@@ -171,11 +175,17 @@ class BallClass {
     {
         float total_balls = ballObjects.size();
         for(int i = own_index+1 ; i<total_balls; i++){
+
+            if(!ballObjects[i]->activated)continue;
+
             centerPair.set(coordX-ballObjects[i]->coordX,coordY-ballObjects[i]->coordY);
             float dist = computeMagnitude(centerPair);
             if(dist>(radius+ballObjects[i]->radius) || dist<0.0001f)
                 continue;
             ball_collide_sound->play();
+            // ballObjects[i]->health = health_function(ballObjects[i]->priority,ballObjects[i]->health);
+            // ballObjects[i]->current_damage_frame = (current_damage_frame==0)?-1:0;
+
             mass2 = ballObjects[i]->mass;
             radius2 = ballObjects[i]->radius;
             v1.set(velocityX,velocityY);
@@ -209,16 +219,39 @@ class BallClass {
 
     }
 
+    void checkFunctions(){
+        if (health <=0){
+            activated = false;
+        }
+    }
+
+    int health_function(int other_ball_health,int other_ball_mass,float otherVelocity)
+    {
+        if(mass*computeMagnitude(pair_custom(velocityX,velocityY))<other_ball_mass*otherVelocity){
+            health--;
+        }
+        else{
+            return other_ball_health-1;                    
+        }        
+
+        return other_ball_health;
+    }
+
 
     public:
     void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*> ballObjects,int own_index)
     {
-        implementGravity();
-        detectCollisionWithBoundary(boundary);
-        changeRotation();
-        detectBallToBallCollision(ballObjects,own_index);
-        checkTerminalVelocity();
-        finalCOORDUpdate();
+        if(activated){
+            checkFunctions();
+            if(gravity_true)
+                implementGravity();
+            detectCollisionWithBoundary(boundary);
+            changeRotation();
+            if(ball_to_ball_collision)
+                detectBallToBallCollision(ballObjects,own_index);
+            checkTerminalVelocity();
+            finalCOORDUpdate();
+        }
     }
     
     void setCOORD_initial(int x,int y)
@@ -227,8 +260,10 @@ class BallClass {
     }
     void drawBall(RenderWindow& window)
     {
-        ballSprite->setPosition({coordX,coordY});//line here temporarily
-        window.draw(*ballSprite);
+        if(activated){
+            ballSprite->setPosition({coordX,coordY});//line here temporarily
+            window.draw(*ballSprite);
+        }
     }
 
     ~BallClass()
@@ -240,28 +275,36 @@ class BallClass {
 class BallBatman:public BallClass
 {
     public:
-    BallBatman(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
+        BallClass::health = 5;
+    }
 };
 class BallSpider:public BallClass
 {
     public:
-    BallSpider(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    BallSpider(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
+        BallClass::health = 7;        
+    }
 };
 class BallSuper:public BallClass
 {
     public:
-    BallSuper(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
+        BallClass::health = 9;        
+    }
 };
 class BallHulk:public BallClass
 {
     public:
-    BallHulk(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){
-        BallClass::e = 1.2;
+    BallHulk(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
+        BallClass::health = 11;
     }
 };
 class BallInvincible:public BallClass
 {
     public:
-    BallInvincible(Texture& batmanBallTexture,float dimention):BallClass(batmanBallTexture, dimention){}
+    BallInvincible(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
+        BallClass::health = 8;
+    }
 };
 
