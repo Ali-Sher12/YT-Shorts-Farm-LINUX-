@@ -14,6 +14,7 @@ float e_global = 1.3;
 float ball_terminal_velocity = 15;
 bool gravity_true = true;
 bool ball_to_ball_collision = true;
+bool backgroundScroll = false;
 ///////////////////
 
 float PI = 3.14159;

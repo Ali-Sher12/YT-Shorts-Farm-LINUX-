@@ -183,8 +183,6 @@ class BallClass {
             if(dist>(radius+ballObjects[i]->radius) || dist<0.0001f)
                 continue;
             ball_collide_sound->play();
-            // ballObjects[i]->health = health_function(ballObjects[i]->priority,ballObjects[i]->health);
-            // ballObjects[i]->current_damage_frame = (current_damage_frame==0)?-1:0;
 
             mass2 = ballObjects[i]->mass;
             radius2 = ballObjects[i]->radius;

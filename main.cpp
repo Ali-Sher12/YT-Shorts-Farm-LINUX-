@@ -5,6 +5,7 @@
 #include <cmath>
 #include <vector>
 #include "globals.h"
+#include "backGround.h"
 #include "boundaries.h"
 #include "ballClass.h"
 
@@ -38,6 +39,7 @@ int main()
     ballObjects[0]->setCOORD_initial(mainBoundary.getcenterPair().x-40,mainBoundary.getcenterPair().y);
     ballObjects[1]->setCOORD_initial(mainBoundary.getcenterPair().x+40,mainBoundary.getcenterPair().y);
 
+    BackGround background;
 ///////////////////////////
     while (window.isOpen())
     {
@@ -59,6 +61,7 @@ int main()
 
         window.clear();
 
+        // background.drawBackground(window);
         for(int i=0;i<total_balls;i++){
             ballObjects[i]->drawBall(window);
         }        
