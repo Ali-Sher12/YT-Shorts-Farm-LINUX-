@@ -20,7 +20,7 @@ int main()
     ball_collide_sound = new Sound(ball_collide_buffer);
     wall_collide_sound = new Sound(wall_collide_buffer);
     ball_collide_sound->setVolume(100);
-    wall_collide_sound->setVolume(100);    
+    wall_collide_sound->setVolume(60);    
 /////////////////////////// Texture setup
     Texture batmanBallTexture,spiderBallTexture,superBallTexture,hulkBallTexture,invincibleBallTexture;
     batmanBallTexture.loadFromFile("Data/Images/bat.png");
@@ -28,23 +28,17 @@ int main()
     spiderBallTexture.loadFromFile("Data/Images/spider.png");
     hulkBallTexture.loadFromFile("Data/Images/hulk.png");    
     invincibleBallTexture.loadFromFile("Data/Images/inv.png");
-    ///////////////////////////    
+///////////////////////////    
     N_Sided_Polygon_Boundary mainBoundary(PolygonSides);
     vector<BallClass*> ballObjects;
-    ballObjects.resize(2);
+    ballObjects.resize(total_balls);
     ballObjects[0] = new BallBatman(batmanBallTexture,50,-10,10);
     ballObjects[1] = new BallSuper(superBallTexture,60,10,-10);
-    // ballObjects[2] = new BallSpider(spiderBallTexture,50);
-    // ballObjects[3] = new BallHulk(hulkBallTexture,60);
-    // ballObjects[4] = new BallInvincible(invincibleBallTexture,50);
 
-    ballObjects[0]->setCOORD_initial(mainBoundary.getCenterX()-40,mainBoundary.getCenterY());
-    ballObjects[1]->setCOORD_initial(mainBoundary.getCenterX()+40,mainBoundary.getCenterY());
-    // ballObjects[2]->setCOORD_initial(mainBoundary.getCenterX()-40,mainBoundary.getCenterY()+40);
-    // ballObjects[3]->setCOORD_initial(mainBoundary.getCenterX()+40,mainBoundary.getCenterY()+40);            
-    // ballObjects[4]->setCOORD_initial(mainBoundary.getCenterX(),mainBoundary.getCenterY()+80);    
+    ballObjects[0]->setCOORD_initial(mainBoundary.getcenterPair().x-40,mainBoundary.getcenterPair().y);
+    ballObjects[1]->setCOORD_initial(mainBoundary.getcenterPair().x+40,mainBoundary.getcenterPair().y);
 
-    ////////////    
+///////////////////////////
     while (window.isOpen())
     {
         while (const optional event = window.pollEvent())
@@ -59,20 +53,20 @@ int main()
             window.close();
         }
         mainBoundary.rotate_polygon_and_map_to_SFML_Window();
-        for(int i=0;i<ballObjects.size();i++){
+        for(int i=0;i<total_balls;i++){
             ballObjects[i]->callBallPhysicsFunctions(&mainBoundary,ballObjects,i);
         }
 
         window.clear();
 
-        for(int i=0;i<ballObjects.size();i++){
+        for(int i=0;i<total_balls;i++){
             ballObjects[i]->drawBall(window);
         }        
         mainBoundary.drawPolygon(window);
         window.display();
         // sleep(milliseconds(1));
     }
-    for(int i=0;i<ballObjects.size();i++){
+    for(int i=0;i<total_balls;i++){
         delete ballObjects[i];
     }
 

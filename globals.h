@@ -6,6 +6,7 @@ using namespace std;
 int screenWidth = 1280;
 int screenHeight = 650;
 int PolygonSides = 5;
+int total_balls = 2;
 float rotationSpeed_Polygon = 0.02;
 float rotationSpeed_ball = 0.04;
 float global_delta_t = 0.03;
@@ -32,7 +33,6 @@ struct pair_custom{
         x=a;y=b;
     }
 };
-
 
 float computeDotProduct(pair_custom A,pair_custom B)
 {

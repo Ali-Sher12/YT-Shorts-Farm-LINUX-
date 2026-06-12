@@ -12,9 +12,8 @@ using namespace sf;
 class N_Sided_Polygon_Boundary{
 
     vector<pair_custom> vertices_original;
-    vector<pair_custom> vertices_transformed_and_mapped;    
-    float centerX = screenWidth/2; // The coordinates
-    float centerY = (screenHeight/2);    
+    vector<pair_custom> vertices_transformed_and_mapped;
+    pair_custom centerPair;
     float radius = 300;
     float rotation_angle = 0;
     float rotation_speed = 0.02;
@@ -29,12 +28,14 @@ class N_Sided_Polygon_Boundary{
         delta_t = global_delta_t;
         if(screenHeight>=screenWidth){
             radius = screenWidth/2 -20;
-            centerY = radius+20;
+            centerPair.x = screenWidth/2 +20;            
+            centerPair.y = radius+20;
         }
     
         else{ 
             radius = screenHeight/2 -20;
-            centerX = radius+20;            
+            centerPair.x = radius+20;            
+            centerPair.y = screenHeight/2+20;            
         }
 
         polygon.setPointCount(N);
@@ -46,8 +47,7 @@ class N_Sided_Polygon_Boundary{
         defineVertices_psuedotype(N);
     }
 
-    float getCenterX(){return centerX;}
-    float getCenterY(){return centerY;}    
+    pair_custom getcenterPair(){return centerPair;}
     vector<pair_custom> getVerticeList(){return vertices_transformed_and_mapped;}
     float getCurrentAngle(){return rotation_angle;}
     float getRotationSpeed(){return rotation_speed;}        
@@ -64,8 +64,7 @@ class N_Sided_Polygon_Boundary{
         for(int i=0; i<N; i++)
         {
             float val2 = val1*i;
-            pair_custom temp_pair;
-            temp_pair.set(radius*cos(val2),radius*sin(val2));
+            pair_custom temp_pair(radius*cos(val2),radius*sin(val2));
             vertices_original.push_back(temp_pair);
             vertices_transformed_and_mapped.push_back(temp_pair);
         }
@@ -81,8 +80,8 @@ class N_Sided_Polygon_Boundary{
         for(int i=0; i<total_vertices; i++)
         {
             vertices_transformed_and_mapped[i].set(
-            vertices_original[i].x*cos(rotation_angle)-vertices_original[i].y*sin(rotation_angle)+centerX,
-            vertices_original[i].x*sin(rotation_angle)+vertices_original[i].y*cos(rotation_angle)+centerY);
+            vertices_original[i].x*cos(rotation_angle)-vertices_original[i].y*sin(rotation_angle)+centerPair.x,
+            vertices_original[i].x*sin(rotation_angle)+vertices_original[i].y*cos(rotation_angle)+centerPair.y);
             polygon.setPoint(i, Vector2f(vertices_transformed_and_mapped[i].x,vertices_transformed_and_mapped[i].y));            
         }
     }

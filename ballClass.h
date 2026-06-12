@@ -109,7 +109,7 @@ class BallClass {
                 coordY = new_coord_temp.y;
                 //implement step 7, not 6
                 ball_velocity.set(velocityX,velocityY);
-                r_vector.set(-1*(Q.y-boundary->getCenterY()),Q.x-boundary->getCenterX());
+                r_vector.set(-1*(Q.y-boundary->getcenterPair().x),Q.x-boundary->getcenterPair().y);
                 wall_velocity = mulVecPair(boundary->getRotationSpeed(),r_vector);
               
                 relative_velocity = subPair(ball_velocity,wall_velocity);
