@@ -71,13 +71,15 @@ int main()
         window.clear();
 
         background.drawBackground(window);
-        ballObjects[0]->callHeroFunctions(ballObjects,window);
         for(int i=0;i<total_balls;i++){
             ballObjects[i]->drawBall(window);
         }        
         mainBoundary.drawPolygon(window);
+        for(int i=0;i<total_balls;i++){
+            ballObjects[i]->callHeroFunctions(&mainBoundary, ballObjects,window);
+        }        
         window.display();
-        // sleep(milliseconds(1));
+        sleep(milliseconds(100));
     }
     music.stop();
     for(int i=0;i<total_balls;i++){

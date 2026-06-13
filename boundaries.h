@@ -40,7 +40,7 @@ class N_Sided_Polygon_Boundary{
 
         polygon.setPointCount(N);
         polygon.setFillColor(Color::Transparent);
-        polygon.setOutlineColor(Color::Red);
+        polygon.setOutlineColor(Color::Blue);
         polygon.setOutlineThickness(6);
 
         total_vertices = N;    

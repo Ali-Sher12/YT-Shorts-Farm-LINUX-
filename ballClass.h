@@ -5,8 +5,6 @@
 using namespace std;
 using namespace sf;
 
-float gravity_strength = 0.2;
-
 class BallClass {
     //The main class which is responsible for all the physics and 
     //standard stuff, such as collisions and sizes.
@@ -35,7 +33,7 @@ class BallClass {
     float e = 2;
     Texture* myTex;
     public:
-    virtual void callHeroFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
+    virtual void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
     BallClass(Texture& ballTexture,float dimention,float _VelocityX,float _VelocityY)
     {
         myTex = &ballTexture;
@@ -116,7 +114,8 @@ class BallClass {
                 if(computeDotProduct(relative_velocity,normal_vector)<0)
                 {
                     relative_velocity = subPair(relative_velocity,mulVecPair((1+e)*computeDotProduct(relative_velocity,normal_vector),normal_vector));
-                    relative_velocity = implementFriction(AB,relative_velocity);
+                    if(friction_enabled)
+                        relative_velocity = implementFriction(AB,relative_velocity);
                     ball_velocity = addPair(relative_velocity,wall_velocity);
                     velocityX = ball_velocity.x;
                     velocityY = ball_velocity.y;                
@@ -161,6 +160,7 @@ class BallClass {
     void changeRotation()
     {
         rotation_angle+=velocityX*rotation_const*delta_t;
+        rotation_angle>2*PI?0:rotation_angle;
         rotation_angle_SFML = radians(rotation_angle);
         ballSprite->setRotation(rotation_angle_SFML);
     }
@@ -250,6 +250,7 @@ class BallClass {
     }
 
     public:
+    bool getDeathStat(){return ImDyinChief;}
     float getRadius(){return radius;}
     float getCoordX(){return coordX;}
     float getCoordY(){return coordY;}
@@ -383,12 +384,15 @@ class BallBatman:public BallClass
         }        
     }
     public:
-    void callHeroFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
-        deployBatarang();
-        batarang_animate();        
-        collideDeactivationBatarang(ballObjects);
-        idleDeactivateBatarang();
-        drawBatarang(window);
+    void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) override{
+        if(!getDeathStat() && activated)
+        {
+            deployBatarang();
+            batarang_animate();        
+            collideDeactivationBatarang(ballObjects);
+            idleDeactivateBatarang();
+            drawBatarang(window);
+        }
     }
     ~BallBatman(){// claude said base destructor would be automatically called
         delete BatarangSprite;
@@ -399,22 +403,31 @@ class BallBatman:public BallClass
 class BallSuper:public BallClass
 {
     Vertex laserEyes[2];
-    float edgeX,edgeY;
-    float angle_of_laser = 0;
-    float rotation_speed_of_laser = 0;
 
-    bool laserActivate = false;
-    int appearanceFrames = 5000;
+    bool laserActivate = true;
+    int appearanceFrames = 5000;//can be reused for flames as well
     int gapFrames = 6000;
     int frame_index_appearance = 0;
     int frame_index_gap = 0;
-
+    int total_fire_Sprites = 3;
+    Texture* fireTexture;
+    vector<Sprite*> fireSprites;
     public:
     BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
         BallClass::health = 9;        
         laserEyes[0].color = Color::Red;
-        laserEyes[1].position = Vector2f(edgeX, edgeY);
+        laserEyes[1].position = Vector2f(0, 0);
         laserEyes[1].color = Color::Yellow;
+
+        fireTexture = new Texture("Data/Images/fire.png");
+        fireSprites.resize(total_fire_Sprites);
+        for(int i=0;i<total_fire_Sprites;i++)
+        {
+            fireSprites[i] = new Sprite(*fireTexture);
+            fireSprites[i]->setTextureRect(IntRect({(int)(fireTexture->getSize().x/total_fire_Sprites)*i,0}, {fireTexture->getSize().x/total_fire_Sprites, fireTexture->getSize().y}));
+            fireSprites[i]->setOrigin({fireTexture->getSize().x/(total_fire_Sprites*2),fireTexture->getSize().y});
+        }
+
     }
      
     void deployLaser(){
@@ -426,7 +439,56 @@ class BallSuper:public BallClass
         }
         laserEyes[0].position = Vector2f(coordX, coordY);
     }
-    void callHeroFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
+    float t_val = 0,u_val;
+    float t_val_smallest = 100000000000;
+    vector<pair_custom> vec_pairs;
+    pair_custom known_point,pairB_m_A,pairA_m_P,anglePair,foundPair;
+    void find_second_point(N_Sided_Polygon_Boundary* boundary){
+        if(laserActivate){
+            t_val_smallest = 100000000000;
+            known_point.set(coordX,coordY);
+            vec_pairs = boundary->getVerticeList();
+            anglePair.set(cos(rotation_angle),sin(rotation_angle));
+            for(int i=0;i<PolygonSides;i++){
+                pairA_m_P = subPair(vec_pairs[i],known_point);
+                pairB_m_A = subPair(vec_pairs[(i+1)%PolygonSides],vec_pairs[i]);
+                t_val = crossProduct(pairA_m_P,pairB_m_A)
+                        /crossProduct(anglePair,pairB_m_A);
+                u_val = crossProduct(pairA_m_P,anglePair)/crossProduct(anglePair,pairB_m_A);
+                if(t_val>0 && u_val>=0 && u_val<=1)
+                    t_val<t_val_smallest?t_val_smallest=t_val:t_val=t_val;
+            }
+            foundPair = addPair(known_point,mulVecPair(t_val_smallest,anglePair));
+            laserEyes[1].position = Vector2f(foundPair.x,foundPair.y);
+        }
+    }
+    
+    float fire_animation_factor = 6;
+    int fire_animation_index = 0;
+    void drawFire(RenderWindow& window){
+        if(laserActivate){
+            fireSprites[frame_index_appearance%3]->setPosition({laserEyes[1].position.x,laserEyes[1].position.y});
+            window.draw(*fireSprites[frame_index_appearance%3]);
+        }
+    }
+
+    void drawLaser(RenderWindow& window){
+        if(laserActivate){
+            frame_index_appearance++;
+            window.draw(laserEyes,2,PrimitiveType::Lines);  
+            drawFire(window);      
+        }
+        else{
+            frame_index_gap++;
+        }
+    }
+
+    void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) override{
+        if(!getDeathStat() && activated){
+            deployLaser();
+            find_second_point(boundary);
+            drawLaser(window);
+        }
     }    
 };
 

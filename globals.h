@@ -3,16 +3,18 @@ using namespace sf;
 using namespace std;
 
 ///////////////////
-int screenWidth = 650;
+int screenWidth = 1000;
 int screenHeight = 650;
-int PolygonSides = 5;
+int PolygonSides = 6;
 int total_balls = 2;
-float rotationSpeed_Polygon = 0.02;
+float rotationSpeed_Polygon = 0.055;
 float rotationSpeed_ball = 0.04;
 float global_delta_t = 0.03;
-float e_global = 1.3;
+float e_global = 1.2;
 float ball_terminal_velocity = 15;
+float gravity_strength = 0.4;
 bool gravity_true = true;
+bool friction_enabled = false;
 bool ball_to_ball_collision = true;
 bool backgroundScroll = true;
 ///////////////////
@@ -65,5 +67,9 @@ pair_custom normalize(pair_custom v)
 {
     float magnitude = computeMagnitude(v);
     return mulVecPair(1/magnitude, v);
+}
+float crossProduct(pair_custom A,pair_custom B)
+{
+    return A.x*B.y - A.y*B.x;
 }
 
