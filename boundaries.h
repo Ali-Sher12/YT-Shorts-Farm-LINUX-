@@ -28,14 +28,14 @@ class N_Sided_Polygon_Boundary{
         delta_t = global_delta_t;
         if(screenHeight>=screenWidth){
             radius = screenWidth/2 -20;
-            centerPair.x = screenWidth/2 +20;            
-            centerPair.y = radius+20;
+            centerPair.x = screenWidth/2;            
+            centerPair.y = radius;
         }
     
         else{ 
             radius = screenHeight/2 -20;
-            centerPair.x = radius+20;            
-            centerPair.y = screenHeight/2+20;            
+            centerPair.x = radius;            
+            centerPair.y = screenHeight/2;            
         }
 
         polygon.setPointCount(N);

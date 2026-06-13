@@ -13,7 +13,7 @@ class BackGround{
     BackGround(){
         backGroundTexture = new Texture("Data/Images/sky.png");
         backGroundSprite = new Sprite(*backGroundTexture);
-        backGroundSprite->setScale({(screenWidth/backGroundTexture->getSize().x),(screenHeight/backGroundTexture->getSize().y)});
+        backGroundSprite->setScale({((float)screenWidth/backGroundTexture->getSize().x),((float)screenHeight/backGroundTexture->getSize().y)});
         backgroundX_alpha = 0; backgroundY = 0;
         backgroundX_beta = -screenWidth;        
     }

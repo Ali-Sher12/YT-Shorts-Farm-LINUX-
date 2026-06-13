@@ -46,6 +46,9 @@ int main()
     ballObjects[1]->setCOORD_initial(mainBoundary.getcenterPair().x+40,mainBoundary.getcenterPair().y);
 
     BackGround background;
+    Music music("Data/Audio/sheepraider7.ogg");
+    music.play();
+    music.isLooping();
 ///////////////////////////
     while (window.isOpen())
     {
@@ -67,7 +70,7 @@ int main()
 
         window.clear();
 
-        // background.drawBackground(window);
+        background.drawBackground(window);
         ballObjects[0]->callHeroFunctions(ballObjects,window);
         for(int i=0;i<total_balls;i++){
             ballObjects[i]->drawBall(window);
@@ -76,6 +79,7 @@ int main()
         window.display();
         // sleep(milliseconds(1));
     }
+    music.stop();
     for(int i=0;i<total_balls;i++){
         delete ballObjects[i];
     }

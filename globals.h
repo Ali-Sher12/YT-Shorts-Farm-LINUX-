@@ -3,7 +3,7 @@ using namespace sf;
 using namespace std;
 
 ///////////////////
-int screenWidth = 1280;
+int screenWidth = 650;
 int screenHeight = 650;
 int PolygonSides = 5;
 int total_balls = 2;
@@ -14,7 +14,7 @@ float e_global = 1.3;
 float ball_terminal_velocity = 15;
 bool gravity_true = true;
 bool ball_to_ball_collision = true;
-bool backgroundScroll = false;
+bool backgroundScroll = true;
 ///////////////////
 
 float PI = 3.14159;

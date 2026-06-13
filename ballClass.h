@@ -177,7 +177,7 @@ class BallClass {
         float total_balls = ballObjects.size();
         for(int i = own_index+1 ; i<total_balls; i++){
 
-            if(!ballObjects[i]->activated && !ballObjects[i]->ImDyinChief)continue;
+            if(!ballObjects[i]->activated || ballObjects[i]->ImDyinChief)continue;
 
             centerPair.set(coordX-ballObjects[i]->coordX,coordY-ballObjects[i]->coordY);
             float dist = computeMagnitude(centerPair);
@@ -389,6 +389,10 @@ class BallBatman:public BallClass
         collideDeactivationBatarang(ballObjects);
         idleDeactivateBatarang();
         drawBatarang(window);
+    }
+    ~BallBatman(){// claude said base destructor would be automatically called
+        delete BatarangSprite;
+        delete BatarangTexture;   
     }
     
 };
