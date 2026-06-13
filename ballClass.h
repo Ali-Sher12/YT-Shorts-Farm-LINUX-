@@ -33,10 +33,12 @@ class BallClass {
     bool activated = true;
     int health = 0;
     float e = 2;
+    Texture* myTex;
     public:
-    virtual void callBatarangFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
+    virtual void callHeroFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
     BallClass(Texture& ballTexture,float dimention,float _VelocityX,float _VelocityY)
     {
+        myTex = &ballTexture;
         // Can pass the same texture if multiple balls need to have the same texture                
         e = e_global;
         delta_t = global_delta_t;
@@ -175,7 +177,7 @@ class BallClass {
         float total_balls = ballObjects.size();
         for(int i = own_index+1 ; i<total_balls; i++){
 
-            if(!ballObjects[i]->activated)continue;
+            if(!ballObjects[i]->activated && !ballObjects[i]->ImDyinChief)continue;
 
             centerPair.set(coordX-ballObjects[i]->coordX,coordY-ballObjects[i]->coordY);
             float dist = computeMagnitude(centerPair);
@@ -218,21 +220,59 @@ class BallClass {
 
     void checkFunctions(){
         if (health <=0){
-            activated = false;
+            ballSprite->setColor(Color(255, 0, 0, 255));
+            ImDyinChief = true;
         }
+    }
+
+    int hurt_frames = 250;
+    int hurt_frame_index = 0;
+    bool hurt_ouch = false;
+    void hurt_animation(){
+        ballSprite->setColor(Color(255, 0, 0, 255));
+        hurt_frame_index = 0;
+    }
+
+    bool ImDyinChief = false;
+    int dyin_frames = 1000;
+    int dyin_frame_index = 0;    
+    void death_animation(){
+        dimention-=0.1;
+        radius = dimention/2;
+        ballSprite->setScale
+        ({(dimention/myTex->getSize().x), (dimention/myTex->getSize().y)});
+        if(dyin_frame_index>dyin_frames)
+        {
+            activated = false;
+            ImDyinChief = false;
+        }
+        dyin_frame_index++;
     }
 
     public:
     float getRadius(){return radius;}
     float getCoordX(){return coordX;}
     float getCoordY(){return coordY;}
-    bool getActivationStat(){return activated;}    
+    bool getActivationStat(){return activated && !ImDyinChief;}    
     void depleteHealth(float factor){
         health-=factor;
+        hurt_ouch = true;
+        hurt_sound->play();
+        hurt_animation();
     }        
     void callBallPhysicsFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*> ballObjects,int own_index)
     {
-        if(activated){
+        if(activated && !ImDyinChief){
+            if(hurt_ouch && !ImDyinChief)
+            {
+                if(hurt_frame_index<hurt_frames){
+                    hurt_frame_index++;
+                }
+                else{
+                    hurt_ouch = false;
+                    ballSprite->setColor(Color(255, 255, 255, 255));                
+                }
+            }
             checkFunctions();
             if(gravity_true)
                 implementGravity();
@@ -242,6 +282,9 @@ class BallClass {
                 detectBallToBallCollision(ballObjects,own_index);
             checkTerminalVelocity();
             finalCOORDUpdate();
+        }
+        else if(ImDyinChief){
+            death_animation();
         }
     }
     
@@ -277,9 +320,9 @@ class BallBatman:public BallClass
     int frame_index_gap = 0;    
     BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
         BallClass::health = 5;
-        BatarangTexture = new Texture("Data/Images/inv.png");
+        BatarangTexture = new Texture("Data/Images/batrang.png");
         BatarangSprite = new Sprite(*BatarangTexture);        
-        batarangRadius = BallClass::radius;
+        batarangRadius = BallClass::radius*2;
 
         BatarangSprite->setScale
         ({((batarangRadius*2)/BatarangTexture->getSize().x), ((batarangRadius*2)/BatarangTexture->getSize().y)});
@@ -287,8 +330,10 @@ class BallBatman:public BallClass
 
     }
     void deployBatarang(){
-        if(frame_index_gap>=gapFrames)
+        if(frame_index_gap>gapFrames)
         {
+            swish_sound->play();
+            swish_sound->setLooping(true);
             batarangActivate = true;
             frame_index_gap = 0;
             frame_index_appearance = 0;            
@@ -299,15 +344,16 @@ class BallBatman:public BallClass
     void collideDeactivationBatarang(vector<BallClass*>& ballObjects){
         if(batarangActivate){
             for(int i=0;i<total_balls;i++){
-                cout<<"i : "<<i<<"\n";
                 if(i!=index_in_array && ballObjects[i]->getActivationStat()){
-                    if((ballObjects[i]->getRadius()+batarangRadius)<=computeMagnitude(pair_custom(batarangX-ballObjects[i]->getCoordX(),batarangY-ballObjects[i]->getCoordY())))
+                    if((ballObjects[i]->getRadius()+batarangRadius)>=computeMagnitude(pair_custom(batarangX-ballObjects[i]->getCoordX(),batarangY-ballObjects[i]->getCoordY())))
                     {
+                        // cout<< i <<" Here\n";
                         ballObjects[i]->depleteHealth(1);
-                        // batarangActivate = false;
-                        // frame_index_appearance = 0;
-                        // frame_index_gap = 0;                    
-                        break;
+                        batarangActivate = false;
+                        swish_sound->stop();
+                        frame_index_appearance = 0;
+                        frame_index_gap = 0;
+                        return;
                     }
                 }
             }
@@ -316,6 +362,7 @@ class BallBatman:public BallClass
     void idleDeactivateBatarang(){
         if(frame_index_appearance>appearanceFrames){
             batarangActivate = false;
+            swish_sound->stop();            
             frame_index_appearance = 0;
             frame_index_gap = 0;                    
         }
@@ -330,23 +377,52 @@ class BallBatman:public BallClass
             frame_index_gap++;
         }
     }
+    void batarang_animate(){
+        if(batarangActivate){
+            BatarangSprite->setRotation(radians(frame_index_appearance*0.008));
+        }        
+    }
     public:
-    void callBatarangFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
+    void callHeroFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
         deployBatarang();
+        batarang_animate();        
         collideDeactivationBatarang(ballObjects);
         idleDeactivateBatarang();
         drawBatarang(window);
     }
-
     
 };
 class BallSuper:public BallClass
 {
+    Vertex laserEyes[2];
+    float edgeX,edgeY;
+    float angle_of_laser = 0;
+    float rotation_speed_of_laser = 0;
+
+    bool laserActivate = false;
+    int appearanceFrames = 5000;
+    int gapFrames = 6000;
+    int frame_index_appearance = 0;
+    int frame_index_gap = 0;
+
     public:
     BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
         BallClass::health = 9;        
+        laserEyes[0].color = Color::Red;
+        laserEyes[1].position = Vector2f(edgeX, edgeY);
+        laserEyes[1].color = Color::Yellow;
     }
-    void callBatarangFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
+     
+    void deployLaser(){
+        if(frame_index_gap>gapFrames)
+        {
+            laserActivate = true;
+            frame_index_gap = 0;
+            frame_index_appearance = 0;            
+        }
+        laserEyes[0].position = Vector2f(coordX, coordY);
+    }
+    void callHeroFunctions(vector<BallClass*>& ballObjects,RenderWindow&window) override{
     }    
 };
 

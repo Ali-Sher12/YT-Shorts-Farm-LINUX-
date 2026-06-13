@@ -18,8 +18,8 @@ bool backgroundScroll = false;
 ///////////////////
 
 float PI = 3.14159;
-Sound* ball_collide_sound, *wall_collide_sound;
-SoundBuffer ball_collide_buffer,wall_collide_buffer;
+Sound* ball_collide_sound, *wall_collide_sound,*swish_sound, *hurt_sound;
+SoundBuffer ball_collide_buffer,wall_collide_buffer,hurt_buffer,swish_buffer;
 
 struct pair_custom{
     float x=0;

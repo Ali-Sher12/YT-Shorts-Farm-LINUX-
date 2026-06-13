@@ -18,9 +18,15 @@ int main()
 
     ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
     wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
+    swish_buffer.loadFromFile("Data/Audio/swish.ogg");
+    hurt_buffer.loadFromFile("Data/Audio/hurt.ogg");        
     ball_collide_sound = new Sound(ball_collide_buffer);
     wall_collide_sound = new Sound(wall_collide_buffer);
+    hurt_sound = new Sound(hurt_buffer);
+    swish_sound = new Sound(swish_buffer);    
     ball_collide_sound->setVolume(100);
+    swish_sound->setVolume(100);
+    hurt_sound->setVolume(100);        
     wall_collide_sound->setVolume(60);    
 /////////////////////////// Texture setup
     Texture batmanBallTexture,spiderBallTexture,superBallTexture,hulkBallTexture,invincibleBallTexture;
@@ -62,10 +68,10 @@ int main()
         window.clear();
 
         // background.drawBackground(window);
+        ballObjects[0]->callHeroFunctions(ballObjects,window);
         for(int i=0;i<total_balls;i++){
             ballObjects[i]->drawBall(window);
         }        
-        ballObjects[0]->callBatarangFunctions(ballObjects,window);
         mainBoundary.drawPolygon(window);
         window.display();
         // sleep(milliseconds(1));
