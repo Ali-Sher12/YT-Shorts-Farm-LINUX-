@@ -17,6 +17,7 @@ int main()
 {
     RenderWindow window(VideoMode({screenWidth, screenHeight}), "BallFarm");
     window.setFramerateLimit(FPS);
+
     ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
     wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
     swish_buffer.loadFromFile("Data/Audio/swish.ogg");

@@ -83,7 +83,7 @@ class BallClass {
 
         for(int i=0;i<total_vertices;i++)
         {
-            float collisionOccured = false;
+            bool collisionOccured = false;
             centerPair.set(coordX,coordY);
             A.set(tempBoundaryVertices[i].x,tempBoundaryVertices[i].y);
             B.set(tempBoundaryVertices[(i+1)%total_vertices].x,tempBoundaryVertices[(i+1)%total_vertices].y);
@@ -109,6 +109,7 @@ class BallClass {
                 wall_collide_sound->play();
                 coordX = new_coord_temp.x;
                 coordY = new_coord_temp.y;
+                centerPair.set(coordX,coordY);
                 //implement step 7, not 6
                 ball_velocity.set(velocityX,velocityY);
                 r_vector.set(-1*(Q.y-boundary->getcenterPair().x),Q.x-boundary->getcenterPair().y);
@@ -283,12 +284,12 @@ class BallClass {
             checkFunctions();
             if(gravity_true)
                 implementGravity();
+            finalCOORDUpdate();
             detectCollisionWithBoundary(boundary);
             changeRotation();
             if(ball_to_ball_collision)
                 detectBallToBallCollision(ballObjects,own_index);
             checkTerminalVelocity();
-            finalCOORDUpdate();
         }
         else if(ImDyinChief){
             death_animation();
