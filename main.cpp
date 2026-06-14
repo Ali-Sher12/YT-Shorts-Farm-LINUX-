@@ -14,20 +14,23 @@ using namespace sf;
 
 int main()
 {
-    RenderWindow window(VideoMode({screenWidth, screenHeight}), "Ball Farm");
+    RenderWindow window(VideoMode({screenWidth, screenHeight}), "Taha poop");
 
     ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
     wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
     swish_buffer.loadFromFile("Data/Audio/swish.ogg");
     hurt_buffer.loadFromFile("Data/Audio/hurt.ogg");        
+    laserSoundBuffer.loadFromFile("Data/Audio/laser.wav");    
     ball_collide_sound = new Sound(ball_collide_buffer);
     wall_collide_sound = new Sound(wall_collide_buffer);
     hurt_sound = new Sound(hurt_buffer);
     swish_sound = new Sound(swish_buffer);    
+    laserSound = new Sound(laserSoundBuffer);        
     ball_collide_sound->setVolume(100);
     swish_sound->setVolume(100);
     hurt_sound->setVolume(100);        
-    wall_collide_sound->setVolume(60);    
+    wall_collide_sound->setVolume(60); 
+    laserSound->setVolume(160);       
 /////////////////////////// Texture setup
     Texture batmanBallTexture,spiderBallTexture,superBallTexture,hulkBallTexture,invincibleBallTexture;
     batmanBallTexture.loadFromFile("Data/Images/bat.png");

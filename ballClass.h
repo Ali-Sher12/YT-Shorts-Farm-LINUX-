@@ -440,6 +440,8 @@ class BallSuper:public BallClass
             laserActivate = true;
             frame_index_gap = 0;
             frame_index_appearance = 0;            
+            laserSound->play();
+            laserSound->setLooping(true);            
         }
         laserEyes[0].position = Vector2f(coordX, coordY);
     }
@@ -497,7 +499,8 @@ class BallSuper:public BallClass
         if(frame_index_appearance>appearanceFrames){
             laserActivate = false;
             frame_index_appearance = 0;
-            frame_index_gap = 0;                    
+            frame_index_gap = 0;       
+            laserSound->stop();             
         }
     }
     void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) override{
