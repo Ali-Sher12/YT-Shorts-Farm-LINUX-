@@ -6,6 +6,7 @@
 #include <vector>
 #include "globals.h"
 #include "backGround.h"
+#include "healthBar.h"
 #include "boundaries.h"
 #include "ballClass.h"
 
@@ -16,7 +17,6 @@ int main()
 {
     RenderWindow window(VideoMode({screenWidth, screenHeight}), "BallFarm");
     window.setFramerateLimit(FPS);
-
     ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
     wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
     swish_buffer.loadFromFile("Data/Audio/swish.ogg");
@@ -93,6 +93,13 @@ int main()
     for(int i=0;i<total_balls;i++){
         delete ballObjects[i];
     }
+    delete ball_collide_sound;
+    delete wall_collide_sound;
+    delete swish_sound;
+    delete hurt_sound;
+    delete laserSound;
+    delete barSprite;
+    delete barTexture;
 
     return 0;
 }

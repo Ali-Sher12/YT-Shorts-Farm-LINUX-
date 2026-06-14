@@ -4,8 +4,8 @@ using namespace std;
 
 ///////////////////
 int FPS = 60;
-int screenWidth = 600;
-int screenHeight = 1000;
+int screenWidth = 1200;
+int screenHeight = 650;
 int PolygonSides = 6;
 int total_balls = 2;
 float rotationSpeed_Polygon = 0.07;
@@ -14,12 +14,13 @@ float global_delta_t = 0.6;
 float e_global = 3;
 float batarang_rotate_factor = 0.25;
 float ball_terminal_velocity = 25;
-float gravity_strength = 0.4;
+float gravity_strength = 0.6;
 bool gravity_true = true;
 bool friction_enabled = false;
 bool ball_to_ball_collision = true;
 bool backgroundScroll = true;
 bool screenTypeHoriz = true;
+bool drawHealth = true;
 
 float BGscrollVelocity = 10;
 int dyin_frames = 30;
@@ -34,7 +35,10 @@ int gapFrames_bat = 240;
 float PI = 3.14159;
 Sound* ball_collide_sound, *wall_collide_sound,*swish_sound, *hurt_sound,*laserSound;
 SoundBuffer ball_collide_buffer,wall_collide_buffer,hurt_buffer,swish_buffer,laserSoundBuffer;
-
+Texture* barTexture;
+Sprite* barSprite;
+float boundary_radius_for_healthBar = 0;
+///////////////////
 struct pair_custom{
     float x=0;
     float y=0;

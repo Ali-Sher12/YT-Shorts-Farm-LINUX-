@@ -30,12 +30,14 @@ class N_Sided_Polygon_Boundary{
             radius = screenWidth/2 -20;
             centerPair.x = screenWidth/2;            
             centerPair.y = radius;
+            screenTypeHoriz = false;
         }
     
         else{ 
             radius = screenHeight/2 -20;
             centerPair.x = radius;            
             centerPair.y = screenHeight/2;            
+            screenTypeHoriz = true;
         }
 
         polygon.setPointCount(N);
@@ -45,6 +47,7 @@ class N_Sided_Polygon_Boundary{
 
         total_vertices = N;    
         defineVertices_psuedotype(N);
+        boundary_radius_for_healthBar = radius;
     }
 
     pair_custom getcenterPair(){return centerPair;}

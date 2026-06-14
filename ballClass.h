@@ -33,11 +33,12 @@ class BallClass {
     float e = 2;
     Texture* myTex;
     bool takingDamageFromSupesLaser = true;
-
+    HealthBar* hb;
     public:
     virtual void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
-    BallClass(Texture& ballTexture,float dimention_,float _VelocityX,float _VelocityY)
+    BallClass(Texture& ballTexture,float dimention_,float _VelocityX,float _VelocityY,string hero_name_)
     {
+        hb = new HealthBar(hero_name_);
         myTex = &ballTexture;
         // Can pass the same texture if multiple balls need to have the same texture                
         e = e_global;
@@ -177,6 +178,7 @@ class BallClass {
     void detectBallToBallCollision(vector<BallClass*>& ballObjects,int own_index)
     {
         index_in_array = own_index;
+        hb->setPosition(own_index);
         float total_balls = ballObjects.size();
         for(int i = own_index+1 ; i<total_balls; i++){
 
@@ -291,6 +293,7 @@ class BallClass {
         else if(ImDyinChief){
             death_animation();
         }
+        hb->setHealth(health);
     }
     
     void setCOORD_initial(int x,int y)
@@ -303,6 +306,8 @@ class BallClass {
             ballSprite->setPosition({coordX,coordY});//line here temporarily
             window.draw(*ballSprite);
         }
+        if(drawHealth)
+            hb->drawAll(window);
     }
 
     ~BallClass()
@@ -320,7 +325,7 @@ class BallBatman:public BallClass
     bool batarangActivate = false;
     int frame_index_appearance = 0;
     int frame_index_gap = 0;    
-    BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
+    BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"bat_face"){
         BallClass::health = 10;
         BatarangTexture = new Texture("Data/Images/batrang.png");
         BatarangSprite = new Sprite(*BatarangTexture);        
@@ -397,6 +402,7 @@ class BallBatman:public BallClass
     }
     ~BallBatman(){// claude said base destructor would be automatically called
         delete BatarangSprite;
+        delete hb;
         delete BatarangTexture;   
     }
     
@@ -412,8 +418,10 @@ class BallSuper:public BallClass
     Texture* fireTexture;
     vector<Sprite*> fireSprites;
     public:
-    BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
+    BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"sup_face"){
         BallClass::health = 9;
+        hb->setWidth(180);
+        hb->setHeight(150);        
         setRotationConst(0.01);
         laserEyes[0].color = Color::Red;
         laserEyes[1].position = Vector2f(0, 0);
