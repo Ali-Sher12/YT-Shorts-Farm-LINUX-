@@ -7,7 +7,7 @@ class BackGround{
     Texture* backGroundTexture;
     float backgroundX_alpha,backgroundX_beta;
     float backgroundY;    
-    float scrollVelocity = 0.2;
+    float scrollVelocity = 0.3;
 
     public:    
     BackGround(){

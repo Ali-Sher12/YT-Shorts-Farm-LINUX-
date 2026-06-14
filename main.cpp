@@ -14,7 +14,7 @@ using namespace sf;
 
 int main()
 {
-    RenderWindow window(VideoMode({screenWidth, screenHeight}), "Taha poop");
+    RenderWindow window(VideoMode({screenWidth, screenHeight}), "BallFarm");
 
     ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
     wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
@@ -62,6 +62,11 @@ int main()
         }
         //This must be called before any collision checks
 
+        if (Keyboard::isKeyPressed(Keyboard::Key::N))
+            while(1)
+                if (Keyboard::isKeyPressed(Keyboard::Key::M))  
+                    break;
+
         if (Keyboard::isKeyPressed(Keyboard::Key::Escape))
         {
             window.close();
@@ -82,6 +87,7 @@ int main()
             ballObjects[i]->callHeroFunctions(&mainBoundary, ballObjects,window);
         }        
         window.display();
+        // sleep(milliseconds(4));
     }
     music.stop();
     for(int i=0;i<total_balls;i++){

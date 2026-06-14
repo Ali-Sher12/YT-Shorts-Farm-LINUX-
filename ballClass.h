@@ -32,6 +32,8 @@ class BallClass {
     int health = 0;
     float e = 2;
     Texture* myTex;
+    bool takingDamageFromSupesLaser = true;
+
     public:
     virtual void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
     BallClass(Texture& ballTexture,float dimention,float _VelocityX,float _VelocityY)
@@ -323,7 +325,7 @@ class BallBatman:public BallClass
     int frame_index_appearance = 0;
     int frame_index_gap = 0;    
     BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
-        BallClass::health = 5;
+        BallClass::health = 9;
         BatarangTexture = new Texture("Data/Images/batrang.png");
         BatarangSprite = new Sprite(*BatarangTexture);        
         batarangRadius = BallClass::radius*2;
@@ -348,7 +350,7 @@ class BallBatman:public BallClass
     void collideDeactivationBatarang(vector<BallClass*>& ballObjects){
         if(batarangActivate){
             for(int i=0;i<total_balls;i++){
-                if(i!=index_in_array && ballObjects[i]->getActivationStat()){
+                if(i!=index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat()){
                     if((ballObjects[i]->getRadius()+batarangRadius)>=computeMagnitude(pair_custom(batarangX-ballObjects[i]->getCoordX(),batarangY-ballObjects[i]->getCoordY())))
                     {
                         // cout<< i <<" Here\n";
@@ -480,8 +482,28 @@ class BallSuper:public BallClass
 
     }
 
+    float lasterLength = 0,D_sq = 0;
+    pair_custom P_closest;
     void laserDamageFunction(vector<BallClass*>& ballObjects){
-
+        if(laserActivate){
+            lasterLength = computeMagnitude(pair_custom(coordX-foundPair.x,coordY-foundPair.y));
+            for(int i=0;i<total_balls;i++){
+                if(i != index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat())
+                {
+                   t_val = (ballObjects[i]->getCoordX()-coordX)*anglePair.x+(ballObjects[i]->getCoordY()-coordY)*anglePair.y;
+                   t_val<0?t_val=0:t_val=t_val;
+                   t_val>lasterLength?t_val=lasterLength:t_val=t_val;
+                   P_closest.set(known_point.x+t_val*anglePair.x,known_point.y+t_val*anglePair.y);
+                   D_sq = (ballObjects[i]->getCoordX()-P_closest.x)*(ballObjects[i]->getCoordX()-P_closest.x)+(ballObjects[i]->getCoordY()-P_closest.y)*(ballObjects[i]->getCoordY()-P_closest.y);
+                   if(D_sq<=ballObjects[i]->getRadius()*ballObjects[i]->getRadius()){
+                        laserEyes[1].position = Vector2f({P_closest.x,P_closest.y});
+                        if(takingDamageFromSupesLaser)ballObjects[i]->depleteHealth(1);
+                        takingDamageFromSupesLaser = false;
+                   }
+                   else takingDamageFromSupesLaser=true;
+                }
+            }
+        }
     }
 
     void drawLaser(RenderWindow& window){
@@ -511,6 +533,11 @@ class BallSuper:public BallClass
             laserDamageFunction(ballObjects);            
             drawLaser(window);
         }
+    }
+    ~BallSuper(){
+        delete fireTexture;
+        for(int i=0;i<total_fire_Sprites;i++)
+        delete fireSprites[i];
     }    
 };
 
