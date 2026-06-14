@@ -3,20 +3,32 @@ using namespace sf;
 using namespace std;
 
 ///////////////////
-int screenWidth = 1000;
-int screenHeight = 650;
+int FPS = 60;
+int screenWidth = 600;
+int screenHeight = 1000;
 int PolygonSides = 6;
 int total_balls = 2;
-float rotationSpeed_Polygon = 0.055;
+float rotationSpeed_Polygon = 0.07;
 float rotationSpeed_ball = 0.04;//Superman rotation is changed from this
-float global_delta_t = 0.03;
-float e_global = 1.2;
-float ball_terminal_velocity = 15;
+float global_delta_t = 0.6;
+float e_global = 3;
+float batarang_rotate_factor = 0.25;
+float ball_terminal_velocity = 25;
 float gravity_strength = 0.4;
 bool gravity_true = true;
 bool friction_enabled = false;
 bool ball_to_ball_collision = true;
 bool backgroundScroll = true;
+bool screenTypeHoriz = true;
+
+float BGscrollVelocity = 10;
+int dyin_frames = 30;
+float dimention_reduction_death_anim = 1.7;
+int hurt_frames = 10;
+int appearanceFrames_super = 180;//can be reused for flames as well
+int gapFrames_super = 300;
+int appearanceFrames_bat = 240;//can be reused for flames as well
+int gapFrames_bat = 240;
 ///////////////////
 
 float PI = 3.14159;

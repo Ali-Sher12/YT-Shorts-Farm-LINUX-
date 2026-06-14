@@ -36,7 +36,7 @@ class BallClass {
 
     public:
     virtual void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
-    BallClass(Texture& ballTexture,float dimention,float _VelocityX,float _VelocityY)
+    BallClass(Texture& ballTexture,float dimention_,float _VelocityX,float _VelocityY)
     {
         myTex = &ballTexture;
         // Can pass the same texture if multiple balls need to have the same texture                
@@ -45,7 +45,8 @@ class BallClass {
         terminal_velocity = ball_terminal_velocity;        
         rotation_const = rotationSpeed_ball;
         velocityX = _VelocityX;
-        velocityY = _VelocityY;        
+        velocityY = _VelocityY; 
+        dimention = dimention_;       
         radius = dimention/2;
         mass = radius;
         ballSprite = new Sprite(ballTexture);
@@ -227,7 +228,6 @@ class BallClass {
         }
     }
 
-    int hurt_frames = 250;
     int hurt_frame_index = 0;
     bool hurt_ouch = false;
     void hurt_animation(){
@@ -236,10 +236,9 @@ class BallClass {
     }
 
     bool ImDyinChief = false;
-    int dyin_frames = 1000;
     int dyin_frame_index = 0;    
     void death_animation(){
-        dimention-=0.1;
+        dimention = dimention - dimention_reduction_death_anim;
         radius = dimention/2;
         ballSprite->setScale
         ({(dimention/myTex->getSize().x), (dimention/myTex->getSize().y)});
@@ -319,13 +318,10 @@ class BallBatman:public BallClass
     Texture* BatarangTexture;
     float batarangX,batarangY,batarangRadius;
     bool batarangActivate = false;
-
-    int appearanceFrames = 5000;
-    int gapFrames = 6000;
     int frame_index_appearance = 0;
     int frame_index_gap = 0;    
     BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
-        BallClass::health = 9;
+        BallClass::health = 10;
         BatarangTexture = new Texture("Data/Images/batrang.png");
         BatarangSprite = new Sprite(*BatarangTexture);        
         batarangRadius = BallClass::radius*2;
@@ -336,7 +332,7 @@ class BallBatman:public BallClass
 
     }
     void deployBatarang(){
-        if(frame_index_gap>gapFrames)
+        if(frame_index_gap>gapFrames_bat)
         {
             swish_sound->play();
             swish_sound->setLooping(true);
@@ -366,7 +362,7 @@ class BallBatman:public BallClass
         }
     }
     void idleDeactivateBatarang(){
-        if(frame_index_appearance>appearanceFrames){
+        if(frame_index_appearance>appearanceFrames_bat){
             batarangActivate = false;
             swish_sound->stop();            
             frame_index_appearance = 0;
@@ -385,7 +381,7 @@ class BallBatman:public BallClass
     }
     void batarang_animate(){
         if(batarangActivate){
-            BatarangSprite->setRotation(radians(frame_index_appearance*0.008));
+            BatarangSprite->setRotation(radians(frame_index_appearance*batarang_rotate_factor));
         }        
     }
     public:
@@ -410,8 +406,6 @@ class BallSuper:public BallClass
     Vertex laserEyes[2];
 
     bool laserActivate = false;
-    int appearanceFrames = 8000;//can be reused for flames as well
-    int gapFrames = 10000;
     int frame_index_appearance = 0;
     int frame_index_gap = 0;
     int total_fire_Sprites = 3;
@@ -437,7 +431,7 @@ class BallSuper:public BallClass
     }
      
     void deployLaser(){
-        if(frame_index_gap>gapFrames)
+        if(frame_index_gap>gapFrames_super)
         {
             laserActivate = true;
             frame_index_gap = 0;
@@ -518,7 +512,7 @@ class BallSuper:public BallClass
         }
     }
     void idleDeactivateLaser(){
-        if(frame_index_appearance>appearanceFrames){
+        if(frame_index_appearance>appearanceFrames_super){
             laserActivate = false;
             frame_index_appearance = 0;
             frame_index_gap = 0;       

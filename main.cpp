@@ -15,6 +15,7 @@ using namespace sf;
 int main()
 {
     RenderWindow window(VideoMode({screenWidth, screenHeight}), "BallFarm");
+    window.setFramerateLimit(FPS);
 
     ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
     wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
@@ -50,7 +51,7 @@ int main()
 
     BackGround background;
     Music music("Data/Audio/sheepraider7.ogg");
-    music.play();
+    // music.play();
     music.isLooping();
 ///////////////////////////
     while (window.isOpen())
@@ -87,7 +88,6 @@ int main()
             ballObjects[i]->callHeroFunctions(&mainBoundary, ballObjects,window);
         }        
         window.display();
-        // sleep(milliseconds(4));
     }
     music.stop();
     for(int i=0;i<total_balls;i++){
