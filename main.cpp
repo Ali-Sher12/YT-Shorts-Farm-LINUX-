@@ -79,7 +79,6 @@ int main()
             ballObjects[i]->callHeroFunctions(&mainBoundary, ballObjects,window);
         }        
         window.display();
-        sleep(milliseconds(100));
     }
     music.stop();
     for(int i=0;i<total_balls;i++){

@@ -70,7 +70,7 @@ class BallClass {
     pair_custom new_coord_temp;          
     pair_custom P;
     pair_custom perp;
-    float rotation_const = 0.015;
+    float rotation_const = 0;
 
     void detectCollisionWithBoundary(N_Sided_Polygon_Boundary* boundary)
     {
@@ -250,6 +250,9 @@ class BallClass {
     }
 
     public:
+    void setRotationConst(float rotation_const_new){
+        rotation_const = rotation_const_new;
+    }
     bool getDeathStat(){return ImDyinChief;}
     float getRadius(){return radius;}
     float getCoordX(){return coordX;}
@@ -404,9 +407,9 @@ class BallSuper:public BallClass
 {
     Vertex laserEyes[2];
 
-    bool laserActivate = true;
-    int appearanceFrames = 5000;//can be reused for flames as well
-    int gapFrames = 6000;
+    bool laserActivate = false;
+    int appearanceFrames = 8000;//can be reused for flames as well
+    int gapFrames = 10000;
     int frame_index_appearance = 0;
     int frame_index_gap = 0;
     int total_fire_Sprites = 3;
@@ -414,7 +417,8 @@ class BallSuper:public BallClass
     vector<Sprite*> fireSprites;
     public:
     BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY){
-        BallClass::health = 9;        
+        BallClass::health = 9;
+        setRotationConst(0.01);
         laserEyes[0].color = Color::Red;
         laserEyes[1].position = Vector2f(0, 0);
         laserEyes[1].color = Color::Yellow;
@@ -463,13 +467,19 @@ class BallSuper:public BallClass
         }
     }
     
-    float fire_animation_factor = 6;
-    int fire_animation_index = 0;
+    float fire_animation_index = 0;
     void drawFire(RenderWindow& window){
         if(laserActivate){
-            fireSprites[frame_index_appearance%3]->setPosition({laserEyes[1].position.x,laserEyes[1].position.y});
-            window.draw(*fireSprites[frame_index_appearance%3]);
+            fire_animation_index+=0.02;
+            fireSprites[(int)(fire_animation_index)%total_fire_Sprites]->setPosition({laserEyes[1].position.x,laserEyes[1].position.y});
+            window.draw(*fireSprites[(int)(fire_animation_index)%total_fire_Sprites]);
+            frame_index_appearance++;
         }
+
+    }
+
+    void laserDamageFunction(vector<BallClass*>& ballObjects){
+
     }
 
     void drawLaser(RenderWindow& window){
@@ -479,14 +489,23 @@ class BallSuper:public BallClass
             drawFire(window);      
         }
         else{
+            fire_animation_index = 0;
             frame_index_gap++;
         }
     }
-
+    void idleDeactivateLaser(){
+        if(frame_index_appearance>appearanceFrames){
+            laserActivate = false;
+            frame_index_appearance = 0;
+            frame_index_gap = 0;                    
+        }
+    }
     void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) override{
         if(!getDeathStat() && activated){
             deployLaser();
+            idleDeactivateLaser();
             find_second_point(boundary);
+            laserDamageFunction(ballObjects);            
             drawLaser(window);
         }
     }    
