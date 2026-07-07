@@ -2,9 +2,11 @@
 using namespace sf;
 using namespace std;
 
+#include "recorder.h"
+
 ///////////////////
 int FPS = 60;
-int screenWidth = 607;
+int screenWidth = 650;
 int screenHeight = 1080;
 int PolygonSides = 6;
 int total_balls = 2;
@@ -26,9 +28,9 @@ float BGscrollVelocity = 10;
 int dyin_frames = 30;
 float dimention_reduction_death_anim = 1.7;
 int hurt_frames = 10;
-int appearanceFrames_super = 180;//can be reused for flames as well
+int appearanceFrames_super = 100;//can be reused for flames as well
 int gapFrames_super = 300;
-int appearanceFrames_bat = 240;//can be reused for flames as well
+int appearanceFrames_bat = 240;
 int gapFrames_bat = 240;
 ///////////////////
 

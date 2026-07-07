@@ -30,12 +30,14 @@ class N_Sided_Polygon_Boundary{
             radius = screenWidth/2 -20;
             centerPair.x = screenWidth/2;            
             centerPair.y = radius;
+            centerPair.y+=20;
             screenTypeHoriz = false;
         }
     
         else{ 
             radius = screenHeight/2 -20;
-            centerPair.x = radius;            
+            centerPair.x = radius;
+            centerPair.x+=20;            
             centerPair.y = screenHeight/2;            
             screenTypeHoriz = true;
         }

@@ -1,5 +1,5 @@
 compile:
-	g++ main.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-networK
+	g++ main.cpp -o app -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
 
 run:
 	./app

@@ -422,7 +422,7 @@ class BallSuper:public BallClass
     BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"sup_face"){
         BallClass::health = 9;
         // hb->setWidth(180);
-        hb->setHeight(80);        
+        hb->setHeight(100);        
         setRotationConst(0.01);
         laserEyes[0].color = Color::Red;
         laserEyes[1].position = Vector2f(0, 0);
