@@ -4,8 +4,8 @@ using namespace std;
 
 ///////////////////
 int FPS = 60;
-int screenWidth = 1200;
-int screenHeight = 650;
+int screenWidth = 607;
+int screenHeight = 1080;
 int PolygonSides = 6;
 int total_balls = 2;
 float rotationSpeed_Polygon = 0.07;

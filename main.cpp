@@ -52,7 +52,7 @@ int main()
 
     BackGround background;
     Music music("Data/Audio/sheepraider7.ogg");
-    // music.play();
+    music.play();
     music.isLooping();
 ///////////////////////////
     while (window.isOpen())
