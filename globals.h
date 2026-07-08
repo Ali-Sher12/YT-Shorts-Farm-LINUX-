@@ -6,37 +6,41 @@ using namespace std;
 
 ///////////////////
 int FPS = 60;
-int screenWidth = 650;
-int screenHeight = 1080;
-int PolygonSides = 6;
-int total_balls = 2;
-float rotationSpeed_Polygon = 0.07;
-float rotationSpeed_ball = 0.04;//Superman rotation is changed from this
-float global_delta_t = 0.6;
-float e_global = 3;
+int screenWidth = 1155;
+int screenHeight = 2200;
+int PolygonSides = 5;
+int total_balls = 3;
+float rotationSpeed_Polygon = 0.085;
+float rotationSpeed_ball = 0.025;//Superman rotation is changed from this
+float global_delta_t = 0.65;
+float e_global = 3.5;
 float batarang_rotate_factor = 0.25;
-float ball_terminal_velocity = 25;
-float gravity_strength = 0.6;
-bool gravity_true = true;
+float ball_terminal_velocity = 40;
+float gravity_strength = 0.7;
+bool gravity_true = false;
 bool friction_enabled = false;
 bool ball_to_ball_collision = true;
 bool backgroundScroll = true;
 bool screenTypeHoriz = true;
 bool drawHealth = true;
 
-float BGscrollVelocity = 10;
-int dyin_frames = 30;
+float BGscrollVelocity = 20;
+int dyin_frames = 60;
+float web_rotate_factor = 0.05;
 float dimention_reduction_death_anim = 1.7;
 int hurt_frames = 10;
-int appearanceFrames_super = 100;//can be reused for flames as well
-int gapFrames_super = 300;
-int appearanceFrames_bat = 240;
-int gapFrames_bat = 240;
+int appearanceFrames_super = 180;//can be reused for flames as well
+int gapFrames_super = 200;
+int appearanceFrames_bat = 300;
+int gapFrames_bat = 150;
+int appearanceFrames_spider = 300;
+int gapFrames_spider = 150;
+int postDeathIdleFrames = 100;
 ///////////////////
-
+int total_balls_remaining = total_balls;
 float PI = 3.14159;
-Sound* ball_collide_sound, *wall_collide_sound,*swish_sound, *hurt_sound,*laserSound;
-SoundBuffer ball_collide_buffer,wall_collide_buffer,hurt_buffer,swish_buffer,laserSoundBuffer;
+Sound* ball_collide_sound, *wall_collide_sound,*swish_sound, *hurt_sound,*laserSound,*thwok_sound;
+SoundBuffer ball_collide_buffer,wall_collide_buffer,hurt_buffer,swish_buffer,laserSoundBuffer,thwokSoundBuffer;
 Texture* barTexture;
 Sprite* barSprite;
 float boundary_radius_for_healthBar = 0;
@@ -90,4 +94,3 @@ float crossProduct(pair_custom A,pair_custom B)
 {
     return A.x*B.y - A.y*B.x;
 }
-

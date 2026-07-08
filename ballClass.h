@@ -5,6 +5,7 @@
 using namespace std;
 using namespace sf;
 
+int postDeathIdleFrameCount = 0;
 class BallClass {
     //The main class which is responsible for all the physics and 
     //standard stuff, such as collisions and sizes.
@@ -25,6 +26,7 @@ class BallClass {
     float rotation_angle = 0;
     float mass = 0;
 
+    public:
     Sprite* ballSprite = NULL;
     vector<pair_custom> tempBoundaryVertices;
     int index_in_array = -1;
@@ -35,6 +37,7 @@ class BallClass {
     bool takingDamageFromSupesLaser = true;
     HealthBar* hb;
     public:
+    string ballname = "none";
     virtual void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) = 0;
     BallClass(Texture& ballTexture,float dimention_,float _VelocityX,float _VelocityY,string hero_name_)
     {
@@ -191,6 +194,9 @@ class BallClass {
                 continue;
             ball_collide_sound->play();
 
+            if(ballname == "hulk")ballObjects[i]->depleteHealth(1);
+            else if(ballObjects[i]->ballname == "hulk")depleteHealth(1);
+
             mass2 = ballObjects[i]->mass;
             radius2 = ballObjects[i]->radius;
             v1.set(velocityX,velocityY);
@@ -226,7 +232,10 @@ class BallClass {
 
     void checkFunctions(){
         if (health <=0){
-            ballSprite->setColor(Color(255, 0, 0, 255));
+            if(!(ballname == "hulk"))
+                ballSprite->setColor(Color(255, 0, 0, 255));
+            else
+                ballSprite->setColor(Color(255, 125, 125, 255));        
             ImDyinChief = true;
         }
     }
@@ -234,7 +243,10 @@ class BallClass {
     int hurt_frame_index = 0;
     bool hurt_ouch = false;
     void hurt_animation(){
-        ballSprite->setColor(Color(255, 0, 0, 255));
+        if(!(ballname == "hulk"))        
+            ballSprite->setColor(Color(255, 0, 0, 255));
+        else
+            ballSprite->setColor(Color(255, 125, 125, 255));        
         hurt_frame_index = 0;
     }
 
@@ -249,11 +261,37 @@ class BallClass {
         {
             activated = false;
             ImDyinChief = false;
+            total_balls_remaining--;
         }
         dyin_frame_index++;
     }
 
     public:
+
+    float slowdownIndex = 0;
+    float slowdownFrames = 150;    
+    bool slowdown_boolean = false;
+    float og_terminal_velocity = terminal_velocity;
+    void initiateSlowDown(){
+        //only to be used by spiderman
+        slowdown_boolean = true;
+        terminal_velocity = 8;
+    }
+
+    void ballSlowdown(){
+        if(slowdown_boolean)
+        {
+            if(slowdownIndex < slowdownFrames){
+                slowdownIndex++;
+            }
+            else{
+                slowdownIndex = 0;
+                slowdown_boolean = false;
+                terminal_velocity = og_terminal_velocity;
+            }
+        }        
+    }
+
     void setRotationConst(float rotation_const_new){
         rotation_const = rotation_const_new;
     }
@@ -282,6 +320,7 @@ class BallClass {
                 }
             }
             checkFunctions();
+            ballSlowdown();
             if(gravity_true)
                 implementGravity();
             finalCOORDUpdate();
@@ -307,12 +346,28 @@ class BallClass {
             ballSprite->setPosition({coordX,coordY});//line here temporarily
             window.draw(*ballSprite);
         }
+        //tinker the two conditions below for winning close
+        else if(!activated && ballname == "spiderman"){
+            if(postDeathIdleFrameCount < postDeathIdleFrames){
+                postDeathIdleFrameCount++;
+            }
+            else
+                window.close();            
+        }
+        else if(activated && ballname == "spiderman" && total_balls_remaining<=1){
+            if(postDeathIdleFrameCount < postDeathIdleFrames){
+                postDeathIdleFrameCount++;
+            }
+            else
+                window.close();            
+        }        
         if(drawHealth)
-            hb->drawAll(window);
+        hb->drawAll(window);
     }
-
+    
     ~BallClass()
     {
+        delete hb;
         delete ballSprite;
     }
 };
@@ -327,7 +382,8 @@ class BallBatman:public BallClass
     int frame_index_appearance = 0;
     int frame_index_gap = 0;    
     BallBatman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"bat_face"){
-        BallClass::health = 10;
+        BallClass::health = 12;
+        BallClass::ballname = "batman";        
         BatarangTexture = new Texture("Data/Images/batrang.png");
         BatarangSprite = new Sprite(*BatarangTexture);        
         batarangRadius = BallClass::radius*2;
@@ -353,7 +409,7 @@ class BallBatman:public BallClass
         if(batarangActivate){
             for(int i=0;i<total_balls;i++){
                 if(i!=index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat()){
-                    if((ballObjects[i]->getRadius()+batarangRadius)>=computeMagnitude(pair_custom(batarangX-ballObjects[i]->getCoordX(),batarangY-ballObjects[i]->getCoordY())))
+                    if(((ballObjects[i]->getRadius()+batarangRadius)>=computeMagnitude(pair_custom(batarangX-ballObjects[i]->getCoordX(),batarangY-ballObjects[i]->getCoordY()))) && ballObjects[i]->ballname != "superman")
                     {
                         // cout<< i <<" Here\n";
                         ballObjects[i]->depleteHealth(1);
@@ -368,7 +424,7 @@ class BallBatman:public BallClass
         }
     }
     void idleDeactivateBatarang(){
-        if(frame_index_appearance>appearanceFrames_bat){
+        if( batarangActivate && frame_index_appearance>appearanceFrames_bat){
             batarangActivate = false;
             swish_sound->stop();            
             frame_index_appearance = 0;
@@ -403,7 +459,6 @@ class BallBatman:public BallClass
     }
     ~BallBatman(){// claude said base destructor would be automatically called
         delete BatarangSprite;
-        delete hb;
         delete BatarangTexture;   
     }
     
@@ -419,11 +474,12 @@ class BallSuper:public BallClass
     Texture* fireTexture;
     vector<Sprite*> fireSprites;
     public:
-    BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"sup_face"){
-        BallClass::health = 9;
+    BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"super_face"){
+        BallClass::health = 12;
+        BallClass::ballname = "superman";        
         // hb->setWidth(180);
-        hb->setHeight(100);        
-        setRotationConst(0.01);
+        hb->setHeight(200);        
+        setRotationConst(0.0045);
         laserEyes[0].color = Color::Red;
         laserEyes[1].position = Vector2f(0, 0);
         laserEyes[1].color = Color::Yellow;
@@ -435,6 +491,7 @@ class BallSuper:public BallClass
             fireSprites[i] = new Sprite(*fireTexture);
             fireSprites[i]->setTextureRect(IntRect({(int)(fireTexture->getSize().x/total_fire_Sprites)*i,0}, {fireTexture->getSize().x/total_fire_Sprites, fireTexture->getSize().y}));
             fireSprites[i]->setOrigin({fireTexture->getSize().x/(total_fire_Sprites*2),fireTexture->getSize().y});
+            fireSprites[i]->setScale({2,2});
         }
 
     }
@@ -477,7 +534,7 @@ class BallSuper:public BallClass
     float fire_animation_index = 0;
     void drawFire(RenderWindow& window){
         if(laserActivate){
-            fire_animation_index+=0.02;
+            fire_animation_index+=0.15;
             fireSprites[(int)(fire_animation_index)%total_fire_Sprites]->setPosition({laserEyes[1].position.x,laserEyes[1].position.y});
             window.draw(*fireSprites[(int)(fire_animation_index)%total_fire_Sprites]);
             frame_index_appearance++;
@@ -491,7 +548,7 @@ class BallSuper:public BallClass
         if(laserActivate){
             lasterLength = computeMagnitude(pair_custom(coordX-foundPair.x,coordY-foundPair.y));
             for(int i=0;i<total_balls;i++){
-                if(i != index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat())
+                if(i != index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat() && ballObjects[i]->ballname!="batman")
                 {
                    t_val = (ballObjects[i]->getCoordX()-coordX)*anglePair.x+(ballObjects[i]->getCoordY()-coordY)*anglePair.y;
                    t_val<0?t_val=0:t_val=t_val;
@@ -544,3 +601,108 @@ class BallSuper:public BallClass
     }    
 };
 
+class BallHulk:public BallClass
+{
+    public:
+    BallHulk(Texture& hulkTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(hulkTexture, dimention,_VelocityX,_VelocityY,"hulk_face"){
+        BallClass::health = 15;
+        BallClass::e = 4;
+        BallClass::ballname = "hulk";
+        BallClass::terminal_velocity = 17;
+        // hb->setHeight(210);        
+    }
+    void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) override{}
+
+};
+
+class BallSpiderman:public BallClass
+{
+    public:
+    Sprite* webSprite;
+    Texture* webTexture;
+    float webX,webY,webRadius;
+    bool webActivate = false;
+    int frame_index_appearance = 0;
+    int frame_index_gap = 0;    
+    BallSpiderman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"spider_face"){
+        BallClass::health = 12;
+        BallClass::ballname = "spiderman";        
+        webTexture = new Texture("Data/Images/web.png");
+        webSprite = new Sprite(*webTexture);        
+        webRadius = BallClass::radius*1.25;
+
+        webSprite->setScale
+        ({((webRadius*2)/webTexture->getSize().x), ((webRadius*2)/webTexture->getSize().y)});
+        webSprite->setOrigin({webTexture->getSize().x/2, webTexture->getSize().y/2});
+    }
+    void deployWeb(){
+        if(frame_index_gap>gapFrames_spider)
+        {
+            thwok_sound->play();
+            webActivate = true;
+            frame_index_gap = 0;
+            frame_index_appearance = 0;            
+            webX = BallClass::coordX;
+            webY = BallClass::coordY;        
+        }
+    }
+    void collideDeactivationWeb(vector<BallClass*>& ballObjects){
+        if(webActivate){
+            for(int i=0;i<total_balls;i++){
+                if(i!=index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat()){
+                    if(((ballObjects[i]->getRadius()+webRadius)>=computeMagnitude(pair_custom(webX-ballObjects[i]->getCoordX(),webY-ballObjects[i]->getCoordY()))))
+                    {
+                        ballObjects[i]->depleteHealth(1);
+                        //slowdown
+                        // ballObjects[i]->initiateSlowDown();
+                        webActivate = false;
+                        thwok_sound->stop();
+                        frame_index_appearance = 0;
+                        frame_index_gap = 0;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    void idleDeactivateWeb(N_Sided_Polygon_Boundary* boundary){
+        if(webActivate && frame_index_appearance>appearanceFrames_spider){
+            webActivate = false;
+            thwok_sound->stop();            
+            frame_index_appearance = 0;
+            frame_index_gap = 0;                    
+        }
+    }
+    void web_animate(){
+        if(webActivate){
+            webSprite->setRotation(radians(frame_index_appearance*web_rotate_factor));
+        }        
+    }
+    void drawWeb(RenderWindow& window){
+        if(webActivate){
+            frame_index_appearance++;
+            webSprite->setPosition({webX,webY});
+            window.draw(*webSprite);        
+        }
+        else{
+            frame_index_gap++;
+        }
+    }
+
+    public:
+    void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) override{
+        if(!getDeathStat() && activated)
+        {
+            deployWeb();
+            web_animate();
+            collideDeactivationWeb(ballObjects);
+            idleDeactivateWeb(boundary);
+            drawWeb(window);
+        }
+    }
+    ~BallSpiderman(){// claude said base destructor would be automatically called
+        delete webSprite;
+        delete webTexture;   
+    }
+    
+};

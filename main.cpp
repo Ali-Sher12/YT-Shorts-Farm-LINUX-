@@ -18,6 +18,7 @@ int main()
     RenderWindow window(VideoMode({screenWidth, screenHeight}), "BallFarm");
     window.setFramerateLimit(FPS);
 
+    thwokSoundBuffer.loadFromFile("Data/Audio/web.ogg");
     ball_collide_buffer.loadFromFile("Data/Audio/ball_collision.ogg");
     wall_collide_buffer.loadFromFile("Data/Audio/wall_collision.ogg");    
     swish_buffer.loadFromFile("Data/Audio/swish.ogg");
@@ -28,11 +29,14 @@ int main()
     hurt_sound = new Sound(hurt_buffer);
     swish_sound = new Sound(swish_buffer);    
     laserSound = new Sound(laserSoundBuffer);        
+    thwok_sound = new Sound(thwokSoundBuffer);            
     ball_collide_sound->setVolume(100);
     swish_sound->setVolume(100);
     hurt_sound->setVolume(100);        
     wall_collide_sound->setVolume(60); 
     laserSound->setVolume(160);       
+
+    thwok_sound->setVolume(70);           
 /////////////////////////// Texture setup
     Texture batmanBallTexture,spiderBallTexture,superBallTexture,hulkBallTexture,invincibleBallTexture;
     batmanBallTexture.loadFromFile("Data/Images/bat.png");
@@ -43,15 +47,19 @@ int main()
 ///////////////////////////    
     N_Sided_Polygon_Boundary mainBoundary(PolygonSides);
     vector<BallClass*> ballObjects;
+    total_balls = 2;
     ballObjects.resize(total_balls);
-    ballObjects[0] = new BallBatman(batmanBallTexture,50,-10,10);
-    ballObjects[1] = new BallSuper(superBallTexture,60,10,-10);
+    // ballObjects[0] = new BallBatman(batmanBallTexture,100,-100,100);
+    ballObjects[0] = new BallSuper(superBallTexture,110,100,-100);
+    ballObjects[1] = new BallSpiderman(spiderBallTexture,100,-50,50);    
 
-    ballObjects[0]->setCOORD_initial(mainBoundary.getcenterPair().x-40,mainBoundary.getcenterPair().y);
-    ballObjects[1]->setCOORD_initial(mainBoundary.getcenterPair().x+40,mainBoundary.getcenterPair().y);
+    ballObjects[0]->setCOORD_initial(mainBoundary.getcenterPair().x-100,mainBoundary.getcenterPair().y);
+    ballObjects[1]->setCOORD_initial(mainBoundary.getcenterPair().x+100,mainBoundary.getcenterPair().y);
+    // ballObjects[2]->setCOORD_initial(mainBoundary.getcenterPair().x,mainBoundary.getcenterPair().y+100);
 
     BackGround background;
-    Music music("Data/Audio/sheepraider7.ogg");
+    Music music("Data/Audio/song2.ogg");
+    music.setVolume(40);
     music.play();
     music.isLooping();
 ///////////////////////////
@@ -97,6 +105,7 @@ int main()
     delete ball_collide_sound;
     delete wall_collide_sound;
     delete swish_sound;
+    delete thwok_sound;    
     delete hurt_sound;
     delete laserSound;
     delete barSprite;
