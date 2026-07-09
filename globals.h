@@ -13,34 +13,43 @@ int total_balls = 3;
 float rotationSpeed_Polygon = 0.085;
 float rotationSpeed_ball = 0.025;//Superman rotation is changed from this
 float global_delta_t = 0.65;
-float e_global = 3.5;
+float e_global = 3;
 float batarang_rotate_factor = 0.25;
-float ball_terminal_velocity = 40;
-float gravity_strength = 0.7;
-bool gravity_true = false;
+float ball_terminal_velocity = 30;
+float gravity_strength = 0.3;
+bool gravity_true = true;
 bool friction_enabled = false;
 bool ball_to_ball_collision = true;
 bool backgroundScroll = true;
 bool screenTypeHoriz = true;
 bool drawHealth = true;
 
+bool spiderman_slows = true;
+float slowdownFrames = 80;    
+float slowed_terminal_velocity = 5;
+float velocity_regain = 10;
+
+float superman_rotation_const = 0.008;
+
 float BGscrollVelocity = 20;
 int dyin_frames = 60;
-float web_rotate_factor = 0.05;
+float web_rotate_factor = 0.06;
 float dimention_reduction_death_anim = 1.7;
 int hurt_frames = 10;
-int appearanceFrames_super = 180;//can be reused for flames as well
-int gapFrames_super = 200;
+int appearanceFrames_super = 250;//can be reused for flames as well
+int gapFrames_super = 180;
+int appearanceFrames_home = 320;//can be reused for flames as well
+int gapFrames_home = 250;
 int appearanceFrames_bat = 300;
 int gapFrames_bat = 150;
 int appearanceFrames_spider = 300;
-int gapFrames_spider = 150;
+int gapFrames_spider = 130;
 int postDeathIdleFrames = 100;
 ///////////////////
 int total_balls_remaining = total_balls;
 float PI = 3.14159;
-Sound* ball_collide_sound, *wall_collide_sound,*swish_sound, *hurt_sound,*laserSound,*thwok_sound;
-SoundBuffer ball_collide_buffer,wall_collide_buffer,hurt_buffer,swish_buffer,laserSoundBuffer,thwokSoundBuffer;
+Sound* ball_collide_sound, *wall_collide_sound,*swish_sound, *hurt_sound,*laserSound,*laserSound_home,*thwok_sound;
+SoundBuffer ball_collide_buffer,wall_collide_buffer,hurt_buffer,swish_buffer,laserSoundBuffer,laserSoundBuffer_home,thwokSoundBuffer;
 Texture* barTexture;
 Sprite* barSprite;
 float boundary_radius_for_healthBar = 0;

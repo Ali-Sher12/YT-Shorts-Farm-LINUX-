@@ -52,7 +52,7 @@ class HealthBar{
                 rect->setPosition({(2 * boundary_radius_for_healthBar + 20) + (20 * i) + (profileWidth + 10),index_self*(profileWidth + factorY + 20)});
             }        
             else{
-                rect->setPosition({factorX  + (40 * i) + (profileWidth + 50),(2 * boundary_radius_for_healthBar + 70) + index_self*(profileHeight +factorY)+ 20});
+                rect->setPosition({factorX  + (40 * i) + (profileWidth + 50),(2 * boundary_radius_for_healthBar + 70) + index_self*(profileHeight +factorY)+ 4});
             }
             window.draw(*rect);
         }

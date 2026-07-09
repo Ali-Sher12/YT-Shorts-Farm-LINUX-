@@ -35,6 +35,7 @@ class BallClass {
     float e = 2;
     Texture* myTex;
     bool takingDamageFromSupesLaser = true;
+    bool takingDamageFromHomesLaser = true;    
     HealthBar* hb;
     public:
     string ballname = "none";
@@ -268,14 +269,14 @@ class BallClass {
 
     public:
 
-    float slowdownIndex = 0;
-    float slowdownFrames = 150;    
     bool slowdown_boolean = false;
+    float slowdownIndex = 0;
     float og_terminal_velocity = terminal_velocity;
+
     void initiateSlowDown(){
         //only to be used by spiderman
         slowdown_boolean = true;
-        terminal_velocity = 8;
+        terminal_velocity = slowed_terminal_velocity;
     }
 
     void ballSlowdown(){
@@ -288,6 +289,8 @@ class BallClass {
                 slowdownIndex = 0;
                 slowdown_boolean = false;
                 terminal_velocity = og_terminal_velocity;
+                velocityX<=0?(velocityX-=velocity_regain):(velocityX+=velocity_regain);
+                velocityY<=0?(velocityY-=velocity_regain):(velocityY+=velocity_regain);                
             }
         }        
     }
@@ -347,14 +350,14 @@ class BallClass {
             window.draw(*ballSprite);
         }
         //tinker the two conditions below for winning close
-        else if(!activated && ballname == "spiderman"){
-            if(postDeathIdleFrameCount < postDeathIdleFrames){
-                postDeathIdleFrameCount++;
-            }
-            else
-                window.close();            
-        }
-        else if(activated && ballname == "spiderman" && total_balls_remaining<=1){
+        // else if(!activated && ballname == "superman"){
+        //     if(postDeathIdleFrameCount < postDeathIdleFrames){
+        //         postDeathIdleFrameCount++;
+        //     }
+        //     else
+        //         window.close();            
+        // }
+        else if(total_balls_remaining<=1){
             if(postDeathIdleFrameCount < postDeathIdleFrames){
                 postDeathIdleFrameCount++;
             }
@@ -475,11 +478,11 @@ class BallSuper:public BallClass
     vector<Sprite*> fireSprites;
     public:
     BallSuper(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"super_face"){
-        BallClass::health = 12;
+        BallClass::health = 10;
         BallClass::ballname = "superman";        
         // hb->setWidth(180);
         hb->setHeight(200);        
-        setRotationConst(0.0045);
+        setRotationConst(superman_rotation_const);
         laserEyes[0].color = Color::Red;
         laserEyes[1].position = Vector2f(0, 0);
         laserEyes[1].color = Color::Yellow;
@@ -557,10 +560,10 @@ class BallSuper:public BallClass
                    D_sq = (ballObjects[i]->getCoordX()-P_closest.x)*(ballObjects[i]->getCoordX()-P_closest.x)+(ballObjects[i]->getCoordY()-P_closest.y)*(ballObjects[i]->getCoordY()-P_closest.y);
                    if(D_sq<=ballObjects[i]->getRadius()*ballObjects[i]->getRadius()){
                         laserEyes[1].position = Vector2f({P_closest.x,P_closest.y});
-                        if(takingDamageFromSupesLaser)ballObjects[i]->depleteHealth(1);
-                        takingDamageFromSupesLaser = false;
+                        if(ballObjects[i]->takingDamageFromSupesLaser)ballObjects[i]->depleteHealth(1);
+                        ballObjects[i]->takingDamageFromSupesLaser = false;
                    }
-                   else takingDamageFromSupesLaser=true;
+                   else ballObjects[i]->takingDamageFromSupesLaser=true;
                 }
             }
         }
@@ -625,7 +628,7 @@ class BallSpiderman:public BallClass
     int frame_index_appearance = 0;
     int frame_index_gap = 0;    
     BallSpiderman(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"spider_face"){
-        BallClass::health = 12;
+        BallClass::health = 8;
         BallClass::ballname = "spiderman";        
         webTexture = new Texture("Data/Images/web.png");
         webSprite = new Sprite(*webTexture);        
@@ -650,11 +653,11 @@ class BallSpiderman:public BallClass
         if(webActivate){
             for(int i=0;i<total_balls;i++){
                 if(i!=index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat()){
-                    if(((ballObjects[i]->getRadius()+webRadius)>=computeMagnitude(pair_custom(webX-ballObjects[i]->getCoordX(),webY-ballObjects[i]->getCoordY()))))
+                    if(((ballObjects[i]->getRadius()+webRadius)>=computeMagnitude(pair_custom(webX-ballObjects[i]->getCoordX(),webY-ballObjects[i]->getCoordY()))) && ballObjects[i]->ballname!="spiderman")
                     {
                         ballObjects[i]->depleteHealth(1);
                         //slowdown
-                        // ballObjects[i]->initiateSlowDown();
+                        if(spiderman_slows) ballObjects[i]->initiateSlowDown();
                         webActivate = false;
                         thwok_sound->stop();
                         frame_index_appearance = 0;
@@ -705,4 +708,139 @@ class BallSpiderman:public BallClass
         delete webTexture;   
     }
     
+};
+
+class BallHomelander:public BallClass
+{
+    Vertex laserEyes[2];
+
+    bool laserActivate = false;
+    int frame_index_appearance = 0;
+    int frame_index_gap = 0;
+    int total_fire_Sprites = 3;
+    Texture* fireTexture;
+    vector<Sprite*> fireSprites;
+    public:
+    BallHomelander(Texture& batmanBallTexture,float dimention,float _VelocityX,float _VelocityY):BallClass(batmanBallTexture, dimention,_VelocityX,_VelocityY,"home_face"){
+        BallClass::health = 10;
+        BallClass::ballname = "homelander";        
+        setRotationConst(superman_rotation_const);
+        laserEyes[0].color = Color::Red;
+        laserEyes[1].position = Vector2f(0, 0);
+        laserEyes[1].color = Color::Red;
+
+        fireTexture = new Texture("Data/Images/fire_home.png");
+        fireSprites.resize(total_fire_Sprites);
+        for(int i=0;i<total_fire_Sprites;i++)
+        {
+            fireSprites[i] = new Sprite(*fireTexture);
+            fireSprites[i]->setTextureRect(IntRect({(int)(fireTexture->getSize().x/total_fire_Sprites)*i,0}, {fireTexture->getSize().x/total_fire_Sprites, fireTexture->getSize().y}));
+            fireSprites[i]->setOrigin({fireTexture->getSize().x/(total_fire_Sprites*2),fireTexture->getSize().y});
+            fireSprites[i]->setScale({(96*2.0)/fireTexture->getSize().x,(64*2.0)/fireTexture->getSize().y});
+        }
+
+    }
+     
+    void deployLaser(){
+        if(frame_index_gap>gapFrames_home)
+        {
+            laserActivate = true;
+            frame_index_gap = 0;
+            frame_index_appearance = 0;            
+            laserSound_home->play();
+        }
+        laserEyes[0].position = Vector2f(coordX, coordY);
+    }
+    float t_val = 0,u_val;
+    float t_val_smallest = 100000000000;
+    vector<pair_custom> vec_pairs;
+    pair_custom known_point,pairB_m_A,pairA_m_P,anglePair,foundPair;
+    void find_second_point(N_Sided_Polygon_Boundary* boundary){
+        if(laserActivate){
+            t_val_smallest = 100000000000;
+            known_point.set(coordX,coordY);
+            vec_pairs = boundary->getVerticeList();
+            anglePair.set(cos(rotation_angle),sin(rotation_angle));
+            for(int i=0;i<PolygonSides;i++){
+                pairA_m_P = subPair(vec_pairs[i],known_point);
+                pairB_m_A = subPair(vec_pairs[(i+1)%PolygonSides],vec_pairs[i]);
+                t_val = crossProduct(pairA_m_P,pairB_m_A)
+                        /crossProduct(anglePair,pairB_m_A);
+                u_val = crossProduct(pairA_m_P,anglePair)/crossProduct(anglePair,pairB_m_A);
+                if(t_val>0 && u_val>=0 && u_val<=1)
+                    t_val<t_val_smallest?t_val_smallest=t_val:t_val=t_val;
+            }
+            foundPair = addPair(known_point,mulVecPair(t_val_smallest,anglePair));
+            laserEyes[1].position = Vector2f(foundPair.x,foundPair.y);
+        }
+    }
+    
+    float fire_animation_index = 0;
+    void drawFire(RenderWindow& window){
+        if(laserActivate){
+            fire_animation_index+=0.15;
+            fireSprites[(int)(fire_animation_index)%total_fire_Sprites]->setPosition({laserEyes[1].position.x,laserEyes[1].position.y});
+            window.draw(*fireSprites[(int)(fire_animation_index)%total_fire_Sprites]);
+            frame_index_appearance++;
+        }
+
+    }
+
+    float lasterLength = 0,D_sq = 0;
+    pair_custom P_closest;
+    void laserDamageFunction(vector<BallClass*>& ballObjects){
+        if(laserActivate){
+            lasterLength = computeMagnitude(pair_custom(coordX-foundPair.x,coordY-foundPair.y));
+            for(int i=0;i<total_balls;i++){
+                if(i != index_in_array && ballObjects[i]->getActivationStat() && !ballObjects[i]->getDeathStat() && ballObjects[i]->ballname!="homelander")
+                {
+                   t_val = (ballObjects[i]->getCoordX()-coordX)*anglePair.x+(ballObjects[i]->getCoordY()-coordY)*anglePair.y;
+                   t_val<0?t_val=0:t_val=t_val;
+                   t_val>lasterLength?t_val=lasterLength:t_val=t_val;
+                   P_closest.set(known_point.x+t_val*anglePair.x,known_point.y+t_val*anglePair.y);
+                   D_sq = (ballObjects[i]->getCoordX()-P_closest.x)*(ballObjects[i]->getCoordX()-P_closest.x)+(ballObjects[i]->getCoordY()-P_closest.y)*(ballObjects[i]->getCoordY()-P_closest.y);
+                   if(D_sq<=ballObjects[i]->getRadius()*ballObjects[i]->getRadius()){
+                        laserEyes[1].position = Vector2f({P_closest.x,P_closest.y});
+                        if(ballObjects[i]->takingDamageFromHomesLaser)ballObjects[i]->depleteHealth(1);
+                        ballObjects[i]->takingDamageFromHomesLaser = false;
+                   }
+                   else ballObjects[i]->takingDamageFromHomesLaser=true;
+                }
+            }
+        }
+    }
+
+    void drawLaser(RenderWindow& window){
+        if(laserActivate){
+            frame_index_appearance++;
+            window.draw(laserEyes,2,PrimitiveType::Lines);  
+            drawFire(window);      
+        }
+        else{
+            fire_animation_index = 0;
+            frame_index_gap++;
+        }
+    }
+    void idleDeactivateLaser(){
+        if(frame_index_appearance>appearanceFrames_home){
+            laserActivate = false;
+            frame_index_appearance = 0;
+            frame_index_gap = 0;       
+            laserSound_home->stop();             
+        }
+    }
+    void callHeroFunctions(N_Sided_Polygon_Boundary* boundary,vector<BallClass*>& ballObjects,RenderWindow&window) override{
+        if(!getDeathStat() && activated){
+            deployLaser();
+            idleDeactivateLaser();
+            find_second_point(boundary);
+            laserDamageFunction(ballObjects);            
+            drawLaser(window);
+        }
+    }
+    ~BallHomelander(){
+        delete fireTexture;
+        for(int i=0;i<total_fire_Sprites;i++)
+        delete fireSprites[i];
+    }    
 };

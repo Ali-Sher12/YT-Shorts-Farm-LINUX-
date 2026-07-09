@@ -24,41 +24,45 @@ int main()
     swish_buffer.loadFromFile("Data/Audio/swish.ogg");
     hurt_buffer.loadFromFile("Data/Audio/hurt.ogg");        
     laserSoundBuffer.loadFromFile("Data/Audio/laser.wav");    
+    laserSoundBuffer_home.loadFromFile("Data/Audio/laser_home.ogg");        
     ball_collide_sound = new Sound(ball_collide_buffer);
     wall_collide_sound = new Sound(wall_collide_buffer);
     hurt_sound = new Sound(hurt_buffer);
     swish_sound = new Sound(swish_buffer);    
     laserSound = new Sound(laserSoundBuffer);        
+    laserSound_home = new Sound(laserSoundBuffer_home);            
     thwok_sound = new Sound(thwokSoundBuffer);            
     ball_collide_sound->setVolume(100);
     swish_sound->setVolume(100);
     hurt_sound->setVolume(100);        
     wall_collide_sound->setVolume(60); 
     laserSound->setVolume(160);       
+    laserSound_home->setVolume(160);       
 
     thwok_sound->setVolume(70);           
 /////////////////////////// Texture setup
-    Texture batmanBallTexture,spiderBallTexture,superBallTexture,hulkBallTexture,invincibleBallTexture;
+    Texture homelanderBallTexture,batmanBallTexture,spiderBallTexture,superBallTexture,hulkBallTexture,invincibleBallTexture;
     batmanBallTexture.loadFromFile("Data/Images/bat.png");
     superBallTexture.loadFromFile("Data/Images/sup.png");
     spiderBallTexture.loadFromFile("Data/Images/spider.png");
     hulkBallTexture.loadFromFile("Data/Images/hulk.png");    
     invincibleBallTexture.loadFromFile("Data/Images/inv.png");
+    homelanderBallTexture.loadFromFile("Data/Images/homelander.png");
 ///////////////////////////    
     N_Sided_Polygon_Boundary mainBoundary(PolygonSides);
     vector<BallClass*> ballObjects;
     total_balls = 2;
     ballObjects.resize(total_balls);
-    // ballObjects[0] = new BallBatman(batmanBallTexture,100,-100,100);
-    ballObjects[0] = new BallSuper(superBallTexture,110,100,-100);
-    ballObjects[1] = new BallSpiderman(spiderBallTexture,100,-50,50);    
 
-    ballObjects[0]->setCOORD_initial(mainBoundary.getcenterPair().x-100,mainBoundary.getcenterPair().y);
-    ballObjects[1]->setCOORD_initial(mainBoundary.getcenterPair().x+100,mainBoundary.getcenterPair().y);
-    // ballObjects[2]->setCOORD_initial(mainBoundary.getcenterPair().x,mainBoundary.getcenterPair().y+100);
+    ballObjects[0] = new BallSuper(superBallTexture,140,0,100);    
+    ballObjects[1] = new BallHomelander(homelanderBallTexture,140,-100,-100);
+
+    ballObjects[0]->setCOORD_initial(mainBoundary.getcenterPair().x,mainBoundary.getcenterPair().y);
+    ballObjects[1]->setCOORD_initial(mainBoundary.getcenterPair().x-100,mainBoundary.getcenterPair().y-100);
+
 
     BackGround background;
-    Music music("Data/Audio/song2.ogg");
+    Music music("Data/Audio/song3.ogg");
     music.setVolume(40);
     music.play();
     music.isLooping();
@@ -97,6 +101,7 @@ int main()
             ballObjects[i]->callHeroFunctions(&mainBoundary, ballObjects,window);
         }        
         window.display();
+        if(total_balls_remaining<=1)window.close();
     }
     music.stop();
     for(int i=0;i<total_balls;i++){
@@ -108,6 +113,7 @@ int main()
     delete thwok_sound;    
     delete hurt_sound;
     delete laserSound;
+    delete laserSound_home;    
     delete barSprite;
     delete barTexture;
 
